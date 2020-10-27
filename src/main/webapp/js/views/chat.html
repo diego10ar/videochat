@@ -1,0 +1,41 @@
+<div class="oj-hybrid-applayout-page">
+	<div class="oj-applayout-fixed-top">
+		<header role="banner" class="oj-hybrid-applayout-header">
+			<oj-module config="[[headerConfig]]"></oj-module>
+		</header>
+	</div>
+	<!-- This is where your main page content will be loaded -->
+	<div class="oj-applayout-content">
+		<div role="main" class="oj-hybrid-applayout-content">
+			<div class="oj-hybrid-padding">
+				<h1>Zona de conversación</h1>
+				<i data-bind="html : estado"></i>
+				<strong data-bind="html : error" style="color : red"></strong>
+
+				<div class="oj-flex">
+					<div class="oj-sm-4">
+						<h2>Usuarios</h2>
+						<!-- ko foreach : usuarios -->
+						<div data-bind="html : $data"></div>
+						<!-- /ko -->						
+					</div>
+
+					<div class="oj-sm-4">
+						<h2>Zona de mensajes</h2>
+						<!-- ko foreach : mensajesRecibidos -->
+						<div data-bind="html : $data"></div>
+						<!-- /ko -->
+
+						<input type="text" size="50"
+							data-bind="value : mensajeQueVoyAEnviar">
+						<button data-bind="click : enviarATodos">Enviar mensaje a todos</button>
+					</div>
+					
+					<div class="oj-sm-4">
+						<h2>Zona de vídeo</h2>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
