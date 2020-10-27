@@ -29,21 +29,15 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 			self.headerConfig({'view':view, 'viewModel': app.getHeaderModel()})
 		})
 
-		self.enviarATodos = function() {
-			var mensaje = {
-				type : "BROADCAST",
-				message : self.mensajeQueVoyAEnviar()
-			};
-			self.chat.send(JSON.stringify(mensaje));
-		}
-
 		self.connected = function() {
 			accUtils.announce('Chat page loaded.');
 			document.title = "Chat";
 
 			getUsuariosConectados();
+			
+			self.startCamera();
 
-			self.chat = new WebSocket("ws://localhost:7500/wsGenerico");
+			self.chat = new WebSocket("wss://" + window.location.host + "/wsGenerico");
 			self.chat.onopen = function() {
 				self.estado("Conectado al servidor");
 			}
@@ -51,7 +45,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 			self.chat.onmessage = function(event) {
 				var mensaje = JSON.parse(event.data);
 				if (mensaje.type == "FOR ALL") {
-					self.mensajesRecibidos.push(mensaje);
+					self.mensajesRecibidos.push(mensaje.message);
 				} else if (mensaje.type == "ARRIVAL") {
 					var userName = mensaje.user;
 					self.usuarios.push(userName);
@@ -70,6 +64,14 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 				self.estado("WebSocket cerrado");
 			}
 		};
+		
+		self.enviarATodos = function() {
+			var mensaje = {
+				type : "BROADCAST",
+				message : self.mensajeQueVoyAEnviar()
+			};
+			self.chat.send(JSON.stringify(mensaje));
+		}
 
 		function getUsuariosConectados() {
 			var data = {	
@@ -86,6 +88,29 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 			};
 			$.ajax(data);
 		}
+		
+		self.startCamera = function() {
+			if (navigator.mediaDevices) {
+				const constraints = {
+					audio: false,
+					video: {
+						width: 100, height: 100
+					}
+				};		
+		
+				(async function() {
+					const stream = await navigator.mediaDevices.getUserMedia(constraints);
+					self.handleStream(stream);
+				})();
+			}
+		}
+		
+		self.handleStream = function(stream) {
+			window.stream = stream;
+			var video = document.getElementById("video");
+			video.srcObject = stream;		
+		}
+
 
 		self.disconnected = function() {
 			self.chat.close();
