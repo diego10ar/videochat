@@ -3,6 +3,8 @@ package edu.uclm.esi.videochat.model;
 import java.util.UUID;
 import java.util.Vector;
 
+import org.springframework.web.socket.WebSocketSession;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class User {
@@ -11,6 +13,7 @@ public class User {
 	private String name;
 	private String pwd;
 	private byte[] picture;
+	private WebSocketSession session;
 	
 	public User() {
 		this.id = UUID.randomUUID().toString();
@@ -55,5 +58,13 @@ public class User {
 
 	public void setPicture(byte[] picture) {
 		this.picture = picture;
+	}
+
+	public void setSession(WebSocketSession session) {
+		this.session = session;
+	}
+	
+	public WebSocketSession getSession() {
+		return session;
 	}
 }

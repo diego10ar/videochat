@@ -18,6 +18,8 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 
 		self.mensajesRecibidos = ko.observableArray([]);
 		self.mensajeQueVoyAEnviar = ko.observable("");
+		
+		self.recipient = ko.observable("");
 
 		self.usuarios = ko.observableArray([]);
 
@@ -34,7 +36,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 			document.title = "Chat";
 
 			getUsuariosConectados();
-			
+
 			self.startCamera();
 
 			self.chat = new WebSocket("wss://" + window.location.host + "/wsGenerico");
@@ -64,13 +66,27 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 				self.estado("WebSocket cerrado");
 			}
 		};
-		
+
 		self.enviarATodos = function() {
 			var mensaje = {
 				type : "BROADCAST",
 				message : self.mensajeQueVoyAEnviar()
 			};
 			self.chat.send(JSON.stringify(mensaje));
+		}
+		
+		self.enviarADestinatario = function() {
+			var mensaje = {
+				type : "PARTICULAR",
+				recipient : self.recipient(),
+				message : self.mensajeQueVoyAEnviar()
+			};
+			self.chat.send(JSON.stringify(mensaje));
+		}
+		
+		self.setRecipient = function(valor) {
+			console.log(valor);
+			self.recipient(valor);
 		}
 
 		function getUsuariosConectados() {
@@ -88,27 +104,43 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 			};
 			$.ajax(data);
 		}
-		
+
+		self.wsVideo = new WebSocket("wss://" + window.location.host + "/wsGenerico");
+
+		function onEnterPip() {
+			console.log("Picture-in-Picture mode activated!");
+		}
+
 		self.startCamera = function() {
 			if (navigator.mediaDevices) {
 				const constraints = {
-					audio: false,
-					video: {
-						width: 100, height: 100
-					}
+						audio: false,
+						video: {
+							width: 100, height: 100
+						}
 				};		
-		
+
 				(async function() {
 					const stream = await navigator.mediaDevices.getUserMedia(constraints);
+					stream.onaddtrack = function(a, b) {
+						console.log("Ahora");
+					}
+					self.video = document.getElementById("video");
+					self.video.addEventListener('enterpictureinpicture', onEnterPip, false);
+
 					self.handleStream(stream);
 				})();
 			}
 		}
-		
+
 		self.handleStream = function(stream) {
 			window.stream = stream;
-			var video = document.getElementById("video");
-			video.srcObject = stream;		
+			self.video.srcObject = stream;
+			var data = {};
+			data.video = stream;
+			data.metadata = 'test metadata';
+			data.action = "upload_video";
+			//self.wsVideo.send(stream);
 		}
 
 

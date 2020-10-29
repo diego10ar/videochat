@@ -2,7 +2,6 @@ package edu.uclm.esi.videochat.http;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -31,6 +30,8 @@ public class UsersController {
 		if (user==null)
 			throw new Exception("Incorrect login");
 		Manager.get().add(user);
+		request.getSession().setAttribute("user", user);
+		Manager.get().add(request.getSession());
 		return user.getId();
 	}
 	

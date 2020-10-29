@@ -16,7 +16,7 @@
 					<div class="oj-sm-4">
 						<h2>Usuarios</h2>
 						<!-- ko foreach : usuarios -->
-						<div data-bind="html : $data"></div>
+						<div data-bind="html : $data, click : $parent.setRecipient"></div>
 						<!-- /ko -->						
 					</div>
 
@@ -29,6 +29,11 @@
 						<input type="text" size="50"
 							data-bind="value : mensajeQueVoyAEnviar">
 						<button data-bind="click : enviarATodos">Enviar mensaje a todos</button>
+						<br>
+						<button data-bind="click : enviarADestinatario">
+							<span>Enviar a </span>
+							<span data-bind="html : recipient"></span>
+						</button>
 					</div>
 					
 					<div class="oj-sm-4">
