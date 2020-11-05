@@ -65,10 +65,11 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 					if (conversacionActual!=null)
 						conversacionActual.addMensaje(mensaje.message);
 					else {
-						conversacionActual = new Conversacion(ko, mensaje.remitente);
+						conversacionActual = new Conversacion(ko, mensaje.remitente, self.chat);
 						conversacionActual.addMensaje(mensaje.message);
 						self.conversaciones.push(conversacionActual);
 					}
+					ponerVisible(mensaje.remitente);
 				}
 			}
 
@@ -93,21 +94,20 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 			self.chat.send(JSON.stringify(mensaje));
 		}
 		
-		self.enviarADestinatario = function() {
-			var mensaje = {
-				type : "PARTICULAR",
-				recipient : self.recipient(),
-				message : self.mensajeQueVoyAEnviar()
-			};
-			self.chat.send(JSON.stringify(mensaje));
-		}
-		
 		self.setRecipient = function(interlocutor) {
 			self.recipient(interlocutor);
 			var conversacion = buscarConversacion(interlocutor);
 			if (conversacion==null) {
-				conversacion = new Conversacion(ko, interlocutor);
+				conversacion = new Conversacion(ko, interlocutor, self.chat);
 				self.conversaciones.push(conversacion);
+			}
+			ponerVisible(interlocutor);
+		}
+		
+		function ponerVisible(interlocutor) {
+			for (var i=0; i<self.conversaciones().length; i++) {
+				var conversacion = self.conversaciones()[i];
+				conversacion.visible(conversacion.interlocutor == interlocutor);
 			}
 		}
 

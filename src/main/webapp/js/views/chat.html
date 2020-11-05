@@ -33,23 +33,21 @@
 								<input type="text" size="50"
 									data-bind="value : mensajeQueVoyAEnviar">
 								<button data-bind="click : enviarATodos">Enviar mensaje a todos</button>
-								<br>
-								<button data-bind="click : enviarADestinatario">
-									<span>Enviar a </span>
-									<span data-bind="html : recipient"></span>
-								</button>
-								
+								<br>								
 							</div>
 						</div>
 						<div class="oj-sm-12">
 							<h2>Zona de conversaciones</h2>
 							<!-- ko foreach : conversaciones -->
-							<div>
+							<div data-bind="visible : visible">
 								Chat con <span data-bind="html : interlocutor"></span>
 								<!-- ko foreach : mensajes -->
 								<div data-bind="html : $data"></div>
 								<!-- /ko -->
-								<input type="text" placeholder="Texto de tu mensaje">
+								<input type="text" data-bind="value : textoAEnviar" placeholder="Texto de tu mensaje">
+								<button data-bind="click : enviar">
+									<span>Enviar</span>
+								</button>
 							</div>
 							<!-- /ko -->
 						</div>

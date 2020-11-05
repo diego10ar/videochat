@@ -16,7 +16,9 @@ import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import edu.uclm.esi.videochat.classicdao.MessageDAO;
 import edu.uclm.esi.videochat.model.Manager;
+import edu.uclm.esi.videochat.model.Message;
 import edu.uclm.esi.videochat.model.User;
 
 @Component
@@ -52,19 +54,23 @@ public class WebSocketGenerico extends TextWebSocketHandler {
 	protected void handleTextMessage(WebSocketSession remitente, TextMessage message) throws Exception {
 		JSONObject jso = new JSONObject(message.getPayload());
 		String type = jso.getString("type");
+		
+		String recipient = jso.optString("recipient");
+		String enviador = getUser(remitente).getName();
+		
 		if (type.equals("BROADCAST")) {
 			JSONObject jsoMessage = new JSONObject();
 			jsoMessage.put("type", "FOR ALL");
 			jsoMessage.put("message", jso.getString("message"));
 			broadcast(jsoMessage);
 		} else if (type.equals("PARTICULAR")) {
-			String userName = jso.getString("recipient");
-			String enviador = getUser(remitente).getName();
-			User destinatario = Manager.get().findUser(userName);
+			User destinatario = Manager.get().findUser(recipient);
 			WebSocketSession navegadorDelDestinatario = destinatario.getSession();
 			this.send(navegadorDelDestinatario, "type", "PARTICULAR",
 					"remitente", enviador, "message", jso.getString("message"));
 		}
+		Message receivedMessage = new Message(enviador, recipient, jso.getString("message"));
+		MessageDAO.insert(receivedMessage);
 	}
 
 	private void broadcast(JSONObject jsoMessage) {
