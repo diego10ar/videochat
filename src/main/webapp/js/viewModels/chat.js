@@ -18,6 +18,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 
 		self.mensajesRecibidos = ko.observableArray([]);
 		self.mensajeQueVoyAEnviar = ko.observable("");
+		self.conversaciones = ko.observableArray([]);
 		
 		self.recipient = ko.observable("");
 
@@ -59,7 +60,24 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 							break;
 						}
 					}
-				} 
+				} else if (mensaje.type == "PARTICULAR") {
+					var conversacionActual = buscarConversacion(mensaje.remitente);
+					if (conversacionActual!=null)
+						conversacionActual.addMensaje(mensaje.message);
+					else {
+						conversacionActual = new Conversacion(ko, mensaje.remitente);
+						conversacionActual.addMensaje(mensaje.message);
+						self.conversaciones.push(conversacionActual);
+					}
+				}
+			}
+			
+			function buscarConversacion(interlocutor) {
+				for (var i=0; i<self.conversaciones().length; i++) {
+					if (self.conversaciones()[i].interlocutor==interlocutor)
+						return self.conversaciones()[i];
+				}
+				return null;
 			}
 
 			self.chat.onclose = function() {

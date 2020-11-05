@@ -2,6 +2,7 @@ package edu.uclm.esi.videochat.http;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -26,9 +27,13 @@ public class UsersController {
 		String name = jso.getString("name");
 		String pwd = jso.getString("pwd");
 		String ip = request.getRemoteAddr();
-		User user = UsersDAO.findByUserNameAndPassword(name, pwd, ip);
+		/*User user = UsersDAO.findByUserNameAndPassword(name, pwd, ip);
 		if (user==null)
-			throw new Exception("Incorrect login");
+			throw new Exception("Incorrect login");*/
+		User user = new User();
+		user.setId(UUID.randomUUID().toString());
+		user.setName(name);
+		user.setPwd(pwd);
 		Manager.get().add(user);
 		request.getSession().setAttribute("user", user);
 		Manager.get().add(request.getSession());
