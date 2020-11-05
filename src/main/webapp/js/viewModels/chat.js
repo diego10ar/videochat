@@ -71,19 +71,19 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 					}
 				}
 			}
-			
-			function buscarConversacion(interlocutor) {
-				for (var i=0; i<self.conversaciones().length; i++) {
-					if (self.conversaciones()[i].interlocutor==interlocutor)
-						return self.conversaciones()[i];
-				}
-				return null;
-			}
 
 			self.chat.onclose = function() {
 				self.estado("WebSocket cerrado");
 			}
 		};
+		
+		function buscarConversacion(interlocutor) {
+			for (var i=0; i<self.conversaciones().length; i++) {
+				if (self.conversaciones()[i].interlocutor==interlocutor)
+					return self.conversaciones()[i];
+			}
+			return null;
+		}
 
 		self.enviarATodos = function() {
 			var mensaje = {
@@ -102,9 +102,13 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 			self.chat.send(JSON.stringify(mensaje));
 		}
 		
-		self.setRecipient = function(valor) {
-			console.log(valor);
-			self.recipient(valor);
+		self.setRecipient = function(interlocutor) {
+			self.recipient(interlocutor);
+			var conversacion = buscarConversacion(interlocutor);
+			if (conversacion==null) {
+				conversacion = new Conversacion(ko, interlocutor);
+				self.conversaciones.push(conversacion);
+			}
 		}
 
 		function getUsuariosConectados() {

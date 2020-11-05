@@ -18,7 +18,9 @@
 							<div class="oj-sm-6">
 								<h2>Usuarios</h2>
 								<!-- ko foreach : usuarios -->
-								<div data-bind="html : $data, click : $parent.setRecipient"></div>
+								<div>
+									<a data-bind="html : $data, click : $parent.setRecipient"></a>
+								</div>
 								<!-- /ko -->						
 							</div>
 
@@ -37,12 +39,20 @@
 									<span data-bind="html : recipient"></span>
 								</button>
 								
-								<!-- ko foreach : conversaciones -->
-								Chat con <span data-bind="html : interlocutor"></span>
-								<!-- /ko -->
 							</div>
 						</div>
-						<div class="oj-sm-12">Zona de conversaciones</div>
+						<div class="oj-sm-12">
+							<h2>Zona de conversaciones</h2>
+							<!-- ko foreach : conversaciones -->
+							<div>
+								Chat con <span data-bind="html : interlocutor"></span>
+								<!-- ko foreach : mensajes -->
+								<div data-bind="html : $data"></div>
+								<!-- /ko -->
+								<input type="text" placeholder="Texto de tu mensaje">
+							</div>
+							<!-- /ko -->
+						</div>
 					</div>
 					
 					<div class="oj-sm-4">
