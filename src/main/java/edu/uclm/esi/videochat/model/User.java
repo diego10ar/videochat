@@ -3,16 +3,23 @@ package edu.uclm.esi.videochat.model;
 import java.util.UUID;
 import java.util.Vector;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Transient;
+
 import org.springframework.web.socket.WebSocketSession;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+@Entity
 public class User {
+	@Id
 	private String id;
 	private String email;
 	private String name;
 	private String pwd;
-	private byte[] picture;
+	private String picture;
+	@Transient
 	private WebSocketSession session;
 	
 	public User() {
@@ -52,11 +59,11 @@ public class User {
 		this.pwd = pwd;
 	}
 
-	public byte[] getPicture() {
+	public String getPicture() {
 		return picture;
 	}
 
-	public void setPicture(byte[] picture) {
+	public void setPicture(String picture) {
 		this.picture = picture;
 	}
 

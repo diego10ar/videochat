@@ -23,6 +23,8 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 		self.recipient = ko.observable("");
 
 		self.usuarios = ko.observableArray([]);
+		
+		self.picture = ko.observable(app.user.picture);
 
 		self.chat = null;
 

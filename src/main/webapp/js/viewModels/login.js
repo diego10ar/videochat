@@ -34,6 +34,7 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				type : "post",
 				contentType : 'application/json',
 				success : function(response) {
+					app.user = response;
 					app.router.go( { path : 'chat' } );
 				},
 				error : function(response) {

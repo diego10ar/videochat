@@ -2,20 +2,24 @@ package edu.uclm.esi.videochat.model;
 
 import java.util.UUID;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+@Entity
 public class Message {
+	@Id
 	private String id;
 	private String sender;
 	private String recipient;
 	private String message;
 	private long date;
 
-	public Message(String sender, String recipient, String message) {
+
+	public Message () {
 		this.id = UUID.randomUUID().toString();
-		this.sender = sender;
-		this.recipient = recipient;
-		this.message = message;
-		this.date = System.currentTimeMillis();
 	}
+	
+	
 
 	public String getId() {
 		return id;

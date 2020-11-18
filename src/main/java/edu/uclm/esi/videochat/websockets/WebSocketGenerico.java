@@ -16,10 +16,10 @@ import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import edu.uclm.esi.videochat.classicdao.MessageDAO;
 import edu.uclm.esi.videochat.model.Manager;
 import edu.uclm.esi.videochat.model.Message;
 import edu.uclm.esi.videochat.model.User;
+
 
 @Component
 public class WebSocketGenerico extends TextWebSocketHandler {
@@ -69,10 +69,25 @@ public class WebSocketGenerico extends TextWebSocketHandler {
 			this.send(navegadorDelDestinatario, "type", "PARTICULAR",
 					"remitente", enviador, "message", jso.getString("message"));
 		}
-		Message receivedMessage = new Message(enviador, recipient, jso.getString("message"));
-		MessageDAO.insert(receivedMessage);
+		Message mensaje = new Message();
+		mensaje.setMessage(jso.getString("message"));
+		mensaje.setSender(enviador);
+//		if( type.equals("PARTICULAR")) {
+//			mensaje.setRecipient(recipient);
+//		} else {
+//			mensaje.setRecipient(null);
+//		}
+//		mensaje.setSender(enviador);
+//		long date = java.lang.System.currentTimeMillis();
+//		mensaje.setDate(date);
+		guardarMensaje(mensaje);
+		
 	}
 
+	private void guardarMensaje(Message mensaje) {
+		Manager.get().getMessageRepo().save(mensaje);
+		
+	}
 	private void broadcast(JSONObject jsoMessage) {
 		TextMessage message = new TextMessage(jsoMessage.toString());
 		for (WebSocketSession destinatario : this.sesiones) {

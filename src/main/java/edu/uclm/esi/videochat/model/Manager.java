@@ -6,12 +6,25 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.http.HttpSession;
 
-import edu.uclm.esi.videochat.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Component;
 
+import edu.uclm.esi.videochat.model.User;
+import edu.uclm.esi.videochat.springdao.MessageRepository;
+
+@Component
 public class Manager {
 	
 	private ConcurrentHashMap<String, User> usersMap;
 	private ConcurrentHashMap<String, HttpSession> sessions;
+	
+	@Autowired
+	private MessageRepository messageRepo;
+	
+	public MessageRepository getMessageRepo() {
+		return messageRepo;
+	}
 
 	private Manager() {
 		this.usersMap = new ConcurrentHashMap<>();
@@ -22,6 +35,13 @@ public class Manager {
 		static Manager singleton=new Manager();
 	}
 	
+	@Autowired
+	public void print() {
+
+		System.out.println("Creando manager");
+	}
+	
+	@Bean
 	public static Manager get() {
 		return ManagerHolder.singleton;
 	}
@@ -54,4 +74,5 @@ public class Manager {
 	public User findUser(String userName) {
 		return this.usersMap.get(userName);
 	}
+	
 }
