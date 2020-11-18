@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
-import edu.uclm.esi.videochat.model.User;
 import edu.uclm.esi.videochat.springdao.MessageRepository;
 
 @Component
@@ -54,11 +53,13 @@ public class Manager {
 		this.usersMap.remove(user.getName());
 	}
 	
-	public Vector<String> getUserNames() {
-		Vector<String> users = new Vector<>();
+	public Vector<User> getUsuariosConectados() {
+		Vector<User> users = new Vector<>();
 		Enumeration<User> eUsers = this.usersMap.elements();
 		while (eUsers.hasMoreElements()) {
-			users.add(eUsers.nextElement().getName());
+			User user = eUsers.nextElement();
+			user.setPwd(null);
+			users.add(user);
 		}
 		return users;
 	}

@@ -21,7 +21,8 @@
 								<h2>Usuarios</h2>
 								<!-- ko foreach : usuarios -->
 								<div>
-									<a data-bind="html : $data, click : $parent.setRecipient"></a>
+									<img data-bind="attr : { src : picture }" width="20" height="20">
+									<a data-bind="html : name, click : $parent.setRecipient"></a>
 								</div>
 								<!-- /ko -->						
 							</div>

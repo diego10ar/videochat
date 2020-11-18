@@ -33,6 +33,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 					contentType : 'application/json',
 					success : function(response) {
 						alert("Registrado correctamente");
+						app.router.go( { path : "login" } ); // Me lleva a login
 					},
 					error : function(response) {
 						alert("Error: " + response.responseJSON.error);

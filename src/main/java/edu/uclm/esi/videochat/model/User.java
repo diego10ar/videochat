@@ -1,7 +1,6 @@
 package edu.uclm.esi.videochat.model;
 
 import java.util.UUID;
-import java.util.Vector;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -19,7 +18,7 @@ public class User {
 	private String name;
 	private String pwd;
 	private String picture;
-	@Transient
+	@Transient 
 	private WebSocketSession session;
 	
 	public User() {
@@ -71,6 +70,7 @@ public class User {
 		this.session = session;
 	}
 	
+	@JsonIgnore
 	public WebSocketSession getSession() {
 		return session;
 	}

@@ -2,12 +2,12 @@ package edu.uclm.esi.videochat.http;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -77,8 +77,8 @@ public class UsersController {
 			throw new Exception("Credenciales inválidas");
 	}
 	
-	@GetMapping("/getUsuariosConectados")
-	public List<String> getUsuariosConectados() {
-		return Manager.get().getUserNames();
+	@GetMapping(value = "/getUsuariosConectados", produces = MediaType.APPLICATION_JSON_VALUE)
+	public List<User> getUsuariosConectados() {
+		return Manager.get().getUsuariosConectados();
 	}
 }
