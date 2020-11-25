@@ -37,7 +37,7 @@ define(['knockout', 'ojs/ojcorerouter', 'ojs/ojmodulerouter-adapter', 'ojs/ojkno
         { path: 'chat', detail: { label: 'Chat', iconClass: 'oj-ux-ico-fire' } },
         { path: 'customers', detail: { label: 'Customers', iconClass: 'oj-ux-ico-contact-group' } },
         { path: 'register', detail: { label: 'Creación de cuenta', iconClass: 'oj-ux-ico-contact' } },
-        { path: 'about', detail: { label: 'About', iconClass: 'oj-ux-ico-information-s' } }
+        { path: 'devicesManager', detail: { label: 'Gestor de dispositivos', iconClass: 'oj-ux-ico-information-s' } }
       ];
       // Router setup
       var router = new CoreRouter(navData, {

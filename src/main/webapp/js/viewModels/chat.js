@@ -138,10 +138,10 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 		self.startCamera = function() {
 			if (navigator.mediaDevices) {
 				const constraints = {
-						audio: false,
-						video: {
-							width: 100, height: 100
-						}
+					audio: false,
+					video: {
+						width: 100, height: 100
+					}
 				};		
 
 				(async function() {

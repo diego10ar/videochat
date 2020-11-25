@@ -20,6 +20,10 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 		self.goToRegister = function() {
 			app.router.go( { path : 'register' } );
 		}
+		
+		self.goToDevicesManager = function() {
+			app.router.go( { path : 'devicesManager' } );
+		}
 
 		self.login = function() {
 			self.message("Has pulsado login con estas credenciales: "
