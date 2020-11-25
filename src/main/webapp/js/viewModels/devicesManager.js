@@ -12,7 +12,8 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 				{ audio: true, video: true },
 				{ audio: true, video: { width: 1280, height: 720 } },
 				{ audio: true, video : { facingMode : "user"} },
-				{ audio: true, video : { facingMode : "environment"} }
+				{ audio: true, video : { facingMode : "environment"} },
+				{ audio: true, video: { width: { exact : 128000} , height: { exact : 72000 } } },
 			]);
 			
 			this.tracksDeAudio = ko.observableArray([]);
