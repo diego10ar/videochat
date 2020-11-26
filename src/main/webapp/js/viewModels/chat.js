@@ -97,19 +97,19 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 		}
 		
 		self.setRecipient = function(interlocutor) {
-			self.recipient(interlocutor);
-			var conversacion = buscarConversacion(interlocutor);
+			self.recipient(interlocutor.name);
+			var conversacion = buscarConversacion(interlocutor.name);
 			if (conversacion==null) {
-				conversacion = new Conversacion(ko, interlocutor, self.chat);
+				conversacion = new Conversacion(ko, interlocutor.name, self.chat);
 				self.conversaciones.push(conversacion);
 			}
-			ponerVisible(interlocutor);
+			ponerVisible(interlocutor.name);
 		}
 		
-		function ponerVisible(interlocutor) {
+		function ponerVisible(nombreInterlocutor) {
 			for (var i=0; i<self.conversaciones().length; i++) {
 				var conversacion = self.conversaciones()[i];
-				conversacion.visible(conversacion.interlocutor == interlocutor);
+				conversacion.visible(conversacion.interlocutor == nombreInterlocutor);
 			}
 		}
 

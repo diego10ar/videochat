@@ -28,6 +28,7 @@ public class WebSocketGenerico extends TextWebSocketHandler {
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 		session.setBinaryMessageSizeLimit(1000*1024*1024);
+		session.setTextMessageSizeLimit(64*1024);
 		System.out.println(session.getId());
 		User user = getUser(session);
 		user.setSession(session);
@@ -55,7 +56,6 @@ public class WebSocketGenerico extends TextWebSocketHandler {
 		JSONObject jso = new JSONObject(message.getPayload());
 		String type = jso.getString("type");
 		
-		String recipient = jso.optString("recipient");
 		String enviador = getUser(remitente).getName();
 		
 		if (type.equals("BROADCAST")) {
@@ -64,10 +64,16 @@ public class WebSocketGenerico extends TextWebSocketHandler {
 			jsoMessage.put("message", jso.getString("message"));
 			broadcast(jsoMessage);
 		} else if (type.equals("PARTICULAR")) {
+			String recipient = jso.getString("recipient");
 			User destinatario = Manager.get().findUser(recipient);
 			WebSocketSession navegadorDelDestinatario = destinatario.getSession();
+			
+			JSONObject jsoMensajeAEnviar = new JSONObject();
+			jsoMensajeAEnviar.put("texto", jso.get("message"));
+			jsoMensajeAEnviar.put("hora", System.currentTimeMillis());
+			
 			this.send(navegadorDelDestinatario, "type", "PARTICULAR",
-					"remitente", enviador, "message", jso.getString("message"));
+					"remitente", enviador, "message", jsoMensajeAEnviar);
 		}
 		Message mensaje = new Message();
 		mensaje.setMessage(jso.getString("message"));

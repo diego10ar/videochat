@@ -45,7 +45,10 @@
 							<div data-bind="visible : visible">
 								Chat con <span data-bind="html : interlocutor"></span>
 								<!-- ko foreach : mensajes -->
-								<div data-bind="html : $data"></div>
+								<div>
+									<span data-bind="html : hora"></span>:
+									<span data-bind="html : texto"></span>
+								</div>
 								<!-- /ko -->
 								<input type="text" data-bind="value : textoAEnviar" placeholder="Texto de tu mensaje">
 								<button data-bind="click : enviar">

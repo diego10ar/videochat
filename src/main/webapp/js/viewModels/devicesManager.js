@@ -19,6 +19,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 			this.tracksDeAudio = ko.observableArray([]);
 			this.tracksDeVideo = ko.observableArray([]);
 			
+			
 			this.headerConfig = ko.observable({'view':[], 'viewModel' : null});
 			
 			var self = this;
@@ -75,3 +76,13 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 	return DeviceManagerViewModel;
 }
 );
+
+
+
+
+
+
+
+
+
+
