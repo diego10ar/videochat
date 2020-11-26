@@ -17,9 +17,6 @@
 				<!-- ko foreach : dispositivosConectados -->
 				<div style="border-style : solid; border-width : 1px">
 					<div>
-						<strong>objeto completo:</strong> <span data-bind="html : $data"></span>
-					</div>
-					<div>
 						<strong>deviceId:</strong> <span data-bind="html : deviceId"></span>
 					</div>
 					<div>
@@ -31,6 +28,7 @@
 					<div>
 						<strong>label:</strong> <span data-bind="html : label"></span>
 					</div>
+					<button data-bind="click : conectar">Conectar este dispositivo</button>
 				</div>
 				<!-- /ko -->
 				
@@ -56,19 +54,25 @@
 				</div>
 				
 				<div>
-					<video id="widgetVideo" playsinline autoplay></video>
+					<video id="widgetVideo" playsinline autoplay controls></video>
 				</div>
 				
 				<!-- ko if : tracksDeAudio().length>0 -->
 				<div>
 					Hay <span data-bind="html : tracksDeAudio().length"></span> pistas de audio. 
-					<button>Detener todas</button>
+					<button data-bind="click : detenerTodas">Detener todas</button>
 				</div>
 				<!-- /ko -->
+				
+				<!-- ko foreach : tracksDeAudio() -->
+				<strong>Pista:</strong> <span data-bind="html : id"></span>
+				<button data-bind="click : stop">Detener</button>
+				<!-- /ko -->
+				
 				<!-- ko if : tracksDeVideo().length>0 -->
 				<div>
 					Hay <span data-bind="html : tracksDeVideo().length"></span> pistas de video.
-					<button>Detener todas</button>
+					<button data-bind="click : detenerTodas">Detener todas</button>
 				</div>
 				<!-- /ko -->
 			</div>

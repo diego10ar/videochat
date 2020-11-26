@@ -10,6 +10,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 				{ audio: true },
 				{ video: true },
 				{ audio: true, video: true },
+				{ video: { width: 500, height: 20 } },
 				{ audio: true, video: { width: 1280, height: 720 } },
 				{ audio: true, video : { facingMode : "user"} },
 				{ audio: true, video : { facingMode : "environment"} },
@@ -17,8 +18,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 			]);
 			
 			this.tracksDeAudio = ko.observableArray([]);
-			this.tracksDeVideo = ko.observableArray([]);
-			
+			this.tracksDeVideo = ko.observableArray([]);			
 			
 			this.headerConfig = ko.observable({'view':[], 'viewModel' : null});
 			
@@ -34,15 +34,24 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 			document.title = "Gestor de dispositivos";
 			
 			this.cargarDispositivos();
-		}
+		}	
 		
 		cargarDispositivos() {
 			var self = this;
 			navigator.mediaDevices.enumerateDevices().
 				then(function(devices) { 
 					self.dispositivosConectados([]);
-					for (var i=0; i<devices.length; i++)
-						self.dispositivosConectados.push(devices[i]);
+					for (var i=0; i<devices.length; i++) {
+						var theDevice = devices[i];
+						theDevice.conectar = function() {
+							self.buscarDispositivo(
+								{
+									video: { deviceId: this.deviceId }
+								 }
+							);
+						}  
+						self.dispositivosConectados.push(theDevice);
+					}
 				});
 			var cs = navigator.mediaDevices.getSupportedConstraints();
 			for (var field in cs)
@@ -50,6 +59,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 		}
 		
 		buscarDispositivo(caracteristicasBuscadas) {
+			console.log(caracteristicasBuscadas);
 			var self = this;
 			navigator.mediaDevices.getUserMedia(caracteristicasBuscadas).
 				then(function(stream) {
@@ -62,6 +72,15 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 		inspeccionar(stream) {
 			this.tracksDeAudio(stream.getAudioTracks());
 			this.tracksDeVideo(stream.getVideoTracks());
+		}
+		
+		detenerTodas() {
+			for (var i=0; i<this.tracksDeAudio().length; i++)
+				this.tracksDeAudio()[i].stop();
+			for (var i=0; i<this.tracksDeVideo().length; i++)
+				this.tracksDeVideo()[i].stop();
+			var widgetVideo = document.getElementById("widgetVideo");
+			widgetVideo.srcObject = null;
 		}
 
 		disconnected() {
