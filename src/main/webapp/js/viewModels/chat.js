@@ -30,8 +30,6 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 
 			getUsuariosConectados();
 
-			self.startCamera();
-
 			self.chat = new WebSocket("wss://" + window.location.host + "/wsGenerico");
 			self.chat.onopen = function() {
 				self.estado("Conectado al servidor");
@@ -65,6 +63,20 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 						self.conversaciones.push(conversacionActual);
 					}
 					ponerVisible(data.remitente);
+				} else if (data.type == "SOLICITUD_VIDEO") {
+					var remitente = data.remitente;
+					var respuesta = window.confirm(remitente + " quiere hacer una videoconferencia contigo. ¿Estás de acuerdo?");
+					if (respuesta) {
+						console.log("Preparando");
+					} else {
+						var mensaje = {
+							type : "RECHAZO",
+							destinatario : remitente
+						};
+						self.chat.send(JSON.stringify(mensaje));
+					}
+				} else if (data.type == "RECHAZO") {
+					alert("Se ha rechazado tu solicitud de videoconferencia");
 				}
 			}
 
@@ -125,41 +137,17 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 			$.ajax(data);
 		}
 
-		function onEnterPip() {
-			console.log("Picture-in-Picture mode activated!");
+		self.encenderCamara = function() {
+			var caracteristicas = {
+				audio: true, 
+				video: { width: 300, height: 300 },
+			};
+			navigator.mediaDevices.getUserMedia(caracteristicas).
+			then(function(stream) {
+				var widgetVideo = document.getElementById("widgetVideo");
+				widgetVideo.srcObject = stream;
+			});
 		}
-
-		self.startCamera = function() {
-			if (navigator.mediaDevices) {
-				const constraints = {
-					audio: false,
-					video: {
-						width: 100, height: 100
-					}
-				};		
-
-				(async function() {
-					const stream = await navigator.mediaDevices.getUserMedia(constraints);
-					stream.onaddtrack = function(a, b) {
-						console.log("Ahora");
-					}
-					self.video = document.getElementById("video");
-					self.video.addEventListener('enterpictureinpicture', onEnterPip, false);
-
-					self.handleStream(stream);
-				})();
-			}
-		}
-
-		self.handleStream = function(stream) {
-			window.stream = stream;
-			self.video.srcObject = stream;
-			var data = {};
-			data.video = stream;
-			data.metadata = 'test metadata';
-			data.action = "upload_video";
-		}
-
 
 		self.disconnected = function() {
 			self.chat.close();

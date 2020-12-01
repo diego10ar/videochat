@@ -11,6 +11,14 @@ class Conversacion {
 		this.mensajes.push(mensaje);
 	}
 	
+	solicitarVideo() {
+		var mensaje = {
+			type : "SOLICITUD_VIDEO",
+			destinatario : this.nombreInterlocutor
+		};
+		this.ws.send(JSON.stringify(mensaje));
+	}
+	
 	enviar() {
 		var mensaje = {
 			type : "PARTICULAR",

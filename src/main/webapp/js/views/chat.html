@@ -50,6 +50,7 @@
 								<button data-bind="click : enviar">
 									<span>Enviar</span>
 								</button>
+								<button data-bind="click : solicitarVideo">Solicitar vídeo</button>
 								<!-- ko foreach : mensajes -->
 								<div>
 									<span data-bind="html : hora"></span>:
@@ -64,7 +65,8 @@
 					<div class="oj-sm-4">
 						<h2>Zona de vídeo</h2>
 						<div class="oj-sm-12">
-							<video id="video" playsinline autoplay></video>
+							<button data-bind="click : encenderCamara">Encender cámara</button>
+							<video id="widgetVideo" playsinline autoplay controls></video>
 						</div>
 					</div>
 				</div>

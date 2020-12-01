@@ -58,11 +58,11 @@ public class WebSocketGenerico extends TextWebSocketHandler {
 	}
 
 	@Override
-	protected void handleTextMessage(WebSocketSession remitente, TextMessage message) throws Exception {
+	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
 		JSONObject jso = new JSONObject(message.getPayload());
 		String type = jso.getString("type");
 		
-		String enviador = getUser(remitente).getName();
+		String enviador = getUser(session).getName();
 		
 		if (type.equals("BROADCAST")) {
 			JSONObject jsoMessage = new JSONObject();
@@ -70,6 +70,10 @@ public class WebSocketGenerico extends TextWebSocketHandler {
 			jsoMessage.put("time", System.currentTimeMillis());
 			jsoMessage.put("message", jso.getString("texto"));
 			broadcast(jsoMessage);
+			Message mensaje = new Message();
+			mensaje.setMessage(jso.getString("texto"));
+			mensaje.setSender(enviador);
+			guardarMensaje(mensaje);
 		} else if (type.equals("PARTICULAR")) {
 			String destinatario = jso.getString("destinatario");
 			User user = Manager.get().findUser(destinatario);
@@ -81,11 +85,23 @@ public class WebSocketGenerico extends TextWebSocketHandler {
 			
 			this.send(navegadorDelDestinatario, "type", "PARTICULAR",
 					"remitente", enviador, "message", jsoMessage);
+			Message mensaje = new Message();
+			mensaje.setMessage(jso.getString("texto"));
+			mensaje.setSender(enviador);
+			guardarMensaje(mensaje);
+		} else if (type.equals("SOLICITUD_VIDEO")) {
+			String destinatario = jso.getString("destinatario");
+			WrapperSession wrapper = this.sessions.get(session.getId());
+			User remitente = wrapper.getUser();
+			User user = Manager.get().findUser(destinatario);
+			WebSocketSession navegadorDelDestinatario = user.getSession();
+			this.send(navegadorDelDestinatario, "type", "SOLICITUD_VIDEO", "remitente", remitente.getName());
+		} else if (type.equals("RECHAZO")) {
+			String destinatario = jso.getString("destinatario");
+			User user = Manager.get().findUser(destinatario);
+			WebSocketSession navegadorDeDestinatario = user.getSession();
+			this.send(navegadorDeDestinatario, "type", "RECHAZO");
 		}
-		Message mensaje = new Message();
-		mensaje.setMessage(jso.getString("texto"));
-		mensaje.setSender(enviador);
-		guardarMensaje(mensaje);
 	}
 
 	private void guardarMensaje(Message mensaje) {
