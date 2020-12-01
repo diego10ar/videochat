@@ -1,6 +1,6 @@
 class Conversacion {
-	constructor(ko, interlocutor, ws) {
-		this.interlocutor = interlocutor;
+	constructor(ko, nombreInterlocutor, ws) {
+		this.nombreInterlocutor = nombreInterlocutor;
 		this.mensajes = ko.observableArray([]);
 		this.textoAEnviar = ko.observable("");
 		this.ws = ws;
@@ -14,10 +14,11 @@ class Conversacion {
 	enviar() {
 		var mensaje = {
 			type : "PARTICULAR",
-			recipient : this.interlocutor,
-			message : this.textoAEnviar()
+			destinatario : this.nombreInterlocutor,
+			texto : this.textoAEnviar()
 		};
 		this.ws.send(JSON.stringify(mensaje));
-		this.addMensaje(this.textoAEnviar());
+		var mensaje = new Mensaje(this.textoAEnviar());
+		this.addMensaje(mensaje);
 	}
 }

@@ -1,13 +1,3 @@
-/**
- * @license
- * Copyright (c) 2014, 2020, Oracle and/or its affiliates.
- * Licensed under The Universal Permissive License (UPL), Version 1.0
- * as shown at https://oss.oracle.com/licenses/upl/
- * @ignore
- */
-/*
- * Your incidents ViewModel code goes here
- */
 define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 		function(ko, app, moduleUtils, accUtils) {
 
@@ -48,30 +38,33 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 			}
 
 			self.chat.onmessage = function(event) {
-				var mensaje = JSON.parse(event.data);
-				if (mensaje.type == "FOR ALL") {
-					self.mensajesRecibidos.push(mensaje.message);
-				} else if (mensaje.type == "ARRIVAL") {
-					var userName = mensaje.user;
-					self.usuarios.push(userName);
-				} else if (mensaje.type == "BYE") {
-					var userName = mensaje.user;
+				var data = JSON.parse(event.data);
+				if (data.type == "FOR ALL") {
+					var mensaje = new Mensaje(data.message, data.time);
+					self.mensajesRecibidos.push(mensaje);
+				} else if (data.type == "ARRIVAL") {
+					var usuario = new Usuario(data.userName, data.picture);
+					self.usuarios.push(usuario);
+				} else if (data.type == "BYE") {
+					var userName = data.userName;
 					for (var i=0; i<self.usuarios().length; i++) {
-						if (self.usuarios()[i] == userName) {
+						if (self.usuarios()[i].nombre == userName) {
 							self.usuarios.splice(i, 1);
 							break;
 						}
 					}
-				} else if (mensaje.type == "PARTICULAR") {
-					var conversacionActual = buscarConversacion(mensaje.remitente);
-					if (conversacionActual!=null)
-						conversacionActual.addMensaje(mensaje.message);
-					else {
-						conversacionActual = new Conversacion(ko, mensaje.remitente, self.chat);
-						conversacionActual.addMensaje(mensaje.message);
+				} else if (data.type == "PARTICULAR") {
+					var conversacionActual = buscarConversacion(data.remitente);
+					if (conversacionActual!=null) {
+						var mensaje = new Mensaje(data.message.message, data.message.time);
+						conversacionActual.addMensaje(mensaje);
+					} else {
+						conversacionActual = new Conversacion(ko, data.remitente, self.chat);
+						var mensaje = new Mensaje(data.message.message, data.message.time);
+						conversacionActual.addMensaje(mensaje);
 						self.conversaciones.push(conversacionActual);
 					}
-					ponerVisible(mensaje.remitente);
+					ponerVisible(data.remitente);
 				}
 			}
 
@@ -80,9 +73,9 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 			}
 		};
 		
-		function buscarConversacion(interlocutor) {
+		function buscarConversacion(nombreInterlocutor) {
 			for (var i=0; i<self.conversaciones().length; i++) {
-				if (self.conversaciones()[i].interlocutor==interlocutor)
+				if (self.conversaciones()[i].nombreInterlocutor==nombreInterlocutor)
 					return self.conversaciones()[i];
 			}
 			return null;
@@ -97,19 +90,19 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 		}
 		
 		self.setRecipient = function(interlocutor) {
-			self.recipient(interlocutor.name);
-			var conversacion = buscarConversacion(interlocutor.name);
+			self.recipient(interlocutor);
+			var conversacion = buscarConversacion(interlocutor.nombre);
 			if (conversacion==null) {
-				conversacion = new Conversacion(ko, interlocutor.name, self.chat);
+				conversacion = new Conversacion(ko, interlocutor.nombre, self.chat);
 				self.conversaciones.push(conversacion);
 			}
-			ponerVisible(interlocutor.name);
+			ponerVisible(interlocutor.nombre);
 		}
 		
 		function ponerVisible(nombreInterlocutor) {
 			for (var i=0; i<self.conversaciones().length; i++) {
 				var conversacion = self.conversaciones()[i];
-				conversacion.visible(conversacion.interlocutor == nombreInterlocutor);
+				conversacion.visible(conversacion.nombreInterlocutor == nombreInterlocutor);
 			}
 		}
 
@@ -119,8 +112,11 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 					type : "get",
 					contentType : 'application/json',
 					success : function(response) {
-						for (var i=0; i<response.length; i++)
-							self.usuarios.push(response[i]);
+						for (var i=0; i<response.length; i++) {
+							var userName = response[i].name;
+							var picture = response[i].picture;
+							self.usuarios.push(new Usuario(userName, picture));
+						}
 					},
 					error : function(response) {
 						self.error(response.responseJSON.error);
@@ -128,8 +124,6 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 			};
 			$.ajax(data);
 		}
-
-		self.wsVideo = new WebSocket("wss://" + window.location.host + "/wsGenerico");
 
 		function onEnterPip() {
 			console.log("Picture-in-Picture mode activated!");
@@ -164,7 +158,6 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 			data.video = stream;
 			data.metadata = 'test metadata';
 			data.action = "upload_video";
-			//self.wsVideo.send(stream);
 		}
 
 

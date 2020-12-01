@@ -1,8 +1,9 @@
 package edu.uclm.esi.videochat.websockets;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
-import java.util.Vector;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.http.HttpSession;
 
@@ -23,20 +24,25 @@ import edu.uclm.esi.videochat.model.User;
 
 @Component
 public class WebSocketGenerico extends TextWebSocketHandler {
-	private Vector<WebSocketSession> sesiones = new Vector<>();
+	private ConcurrentHashMap<String, WrapperSession> sessions = new ConcurrentHashMap<>();
 	
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 		session.setBinaryMessageSizeLimit(1000*1024*1024);
 		session.setTextMessageSizeLimit(64*1024);
-		System.out.println(session.getId());
+		
 		User user = getUser(session);
 		user.setSession(session);
+
 		JSONObject mensaje = new JSONObject();
 		mensaje.put("type", "ARRIVAL");
-		mensaje.put("user", user.getName());
+		mensaje.put("userName", user.getName());
+		mensaje.put("picture", user.getPicture());
+		
 		this.broadcast(mensaje);
-		this.sesiones.add(session);
+		
+		WrapperSession wrapper = new WrapperSession(session, user);
+		this.sessions.put(session.getId(), wrapper);
 	}
 
 	private User getUser(WebSocketSession session) {
@@ -61,33 +67,25 @@ public class WebSocketGenerico extends TextWebSocketHandler {
 		if (type.equals("BROADCAST")) {
 			JSONObject jsoMessage = new JSONObject();
 			jsoMessage.put("type", "FOR ALL");
-			jsoMessage.put("message", jso.getString("message"));
+			jsoMessage.put("time", System.currentTimeMillis());
+			jsoMessage.put("message", jso.getString("texto"));
 			broadcast(jsoMessage);
 		} else if (type.equals("PARTICULAR")) {
-			String recipient = jso.getString("recipient");
-			User destinatario = Manager.get().findUser(recipient);
-			WebSocketSession navegadorDelDestinatario = destinatario.getSession();
+			String destinatario = jso.getString("destinatario");
+			User user = Manager.get().findUser(destinatario);
+			WebSocketSession navegadorDelDestinatario = user.getSession();
 			
-			JSONObject jsoMensajeAEnviar = new JSONObject();
-			jsoMensajeAEnviar.put("texto", jso.get("message"));
-			jsoMensajeAEnviar.put("hora", System.currentTimeMillis());
+			JSONObject jsoMessage = new JSONObject();
+			jsoMessage.put("time", System.currentTimeMillis());
+			jsoMessage.put("message", jso.get("texto"));
 			
 			this.send(navegadorDelDestinatario, "type", "PARTICULAR",
-					"remitente", enviador, "message", jsoMensajeAEnviar);
+					"remitente", enviador, "message", jsoMessage);
 		}
 		Message mensaje = new Message();
-		mensaje.setMessage(jso.getString("message"));
+		mensaje.setMessage(jso.getString("texto"));
 		mensaje.setSender(enviador);
-//		if( type.equals("PARTICULAR")) {
-//			mensaje.setRecipient(recipient);
-//		} else {
-//			mensaje.setRecipient(null);
-//		}
-//		mensaje.setSender(enviador);
-//		long date = java.lang.System.currentTimeMillis();
-//		mensaje.setDate(date);
 		guardarMensaje(mensaje);
-		
 	}
 
 	private void guardarMensaje(Message mensaje) {
@@ -96,11 +94,12 @@ public class WebSocketGenerico extends TextWebSocketHandler {
 	}
 	private void broadcast(JSONObject jsoMessage) {
 		TextMessage message = new TextMessage(jsoMessage.toString());
-		for (WebSocketSession destinatario : this.sesiones) {
+		Collection<WrapperSession> wrappers = this.sessions.values();
+		for (WrapperSession wrapper : wrappers) {
 			try {
-				destinatario.sendMessage(message);
+				wrapper.getSession().sendMessage(message);
 			} catch (IOException e) {
-				this.sesiones.remove(destinatario);
+				this.sessions.remove(wrapper.getSession().getId());
 			}
 		}
 	}
@@ -111,11 +110,12 @@ public class WebSocketGenerico extends TextWebSocketHandler {
 			jsoMessage.put(values[i], values[i+1]);
 		}
 		TextMessage message = new TextMessage(jsoMessage.toString());
-		for (WebSocketSession destinatario : this.sesiones) {
+		Collection<WrapperSession> wrappers = this.sessions.values();
+		for (WrapperSession wrapper : wrappers) {
 			try {
-				destinatario.sendMessage(message);
+				wrapper.getSession().sendMessage(message);
 			} catch (IOException e) {
-				this.sesiones.remove(destinatario);
+				this.sessions.remove(wrapper.getSession().getId());
 			}
 		}
 	}
@@ -130,8 +130,9 @@ public class WebSocketGenerico extends TextWebSocketHandler {
 	
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-		this.sesiones.remove(session);
-		this.broadcast("type", "BYE", "user", "Un usuario");
+		WrapperSession wrapper = this.sessions.remove(session.getId());
+		Manager.get().remove(wrapper.getUser());
+		this.broadcast("type", "BYE", "userName", wrapper.getUser().getName());
 	}
 	
 	@Override

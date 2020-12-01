@@ -21,8 +21,8 @@
 								<h2>Usuarios</h2>
 								<!-- ko foreach : usuarios -->
 								<div>
-									<img data-bind="attr : { src : picture }" width="20" height="20">
-									<a data-bind="html : name, click : $parent.setRecipient"></a>
+									<img data-bind="attr : { src : foto }" width="20" height="20">
+									<a data-bind="html : nombre, click : $parent.setRecipient"></a>
 								</div>
 								<!-- /ko -->						
 							</div>
@@ -43,17 +43,19 @@
 							<h2>Zona de conversaciones</h2>
 							<!-- ko foreach : conversaciones -->
 							<div data-bind="visible : visible">
-								Chat con <span data-bind="html : interlocutor"></span>
+								<!-- ko with : nombreInterlocutor -->
+								Chat con <span data-bind="html : $data"></span>
+								<!-- /ko -->
+								<input type="text" data-bind="value : textoAEnviar" placeholder="Texto de tu mensaje">
+								<button data-bind="click : enviar">
+									<span>Enviar</span>
+								</button>
 								<!-- ko foreach : mensajes -->
 								<div>
 									<span data-bind="html : hora"></span>:
 									<span data-bind="html : texto"></span>
 								</div>
 								<!-- /ko -->
-								<input type="text" data-bind="value : textoAEnviar" placeholder="Texto de tu mensaje">
-								<button data-bind="click : enviar">
-									<span>Enviar</span>
-								</button>
 							</div>
 							<!-- /ko -->
 						</div>
