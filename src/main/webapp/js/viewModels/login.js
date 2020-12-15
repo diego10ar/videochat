@@ -1,13 +1,3 @@
-/**
- * @license
- * Copyright (c) 2014, 2020, Oracle and/or its affiliates.
- * Licensed under The Universal Permissive License (UPL), Version 1.0
- * as shown at https://oss.oracle.com/licenses/upl/
- * @ignore
- */
-/*
- * Your dashboard ViewModel code goes here
- */
 define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 		'jquery' ], function(ko, app, moduleUtils, accUtils, $) {
 
@@ -16,6 +6,8 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 		self.userName = ko.observable("pepe");
 		self.pwd = ko.observable("pepe");
 		self.message = ko.observable("");
+		
+		app.userName = self.userName();
 		
 		self.goToRegister = function() {
 			app.router.go( { path : 'register' } );
@@ -26,19 +18,18 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 		}
 
 		self.login = function() {
-			self.message("Has pulsado login con estas credenciales: "
-					+ self.userName() + "/" + self.pwd());
+			self.message("Has pulsado login con estas credenciales: " + self.userName() + "/" + self.pwd());
 			var info = {
 				name : self.userName(),
 				pwd : self.pwd()
 			};
 			var data = {
 				data : JSON.stringify(info),
-				url : "login",
+				url : "users/login",
 				type : "post",
 				contentType : 'application/json',
 				success : function(response) {
-					app.user = response;
+					app.user = ko.observable(response);
 					app.router.go( { path : 'chat' } );
 				},
 				error : function(response) {

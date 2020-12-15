@@ -28,7 +28,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 			};
 			var data = {
 					data : JSON.stringify(info),
-					url : "register",
+					url : "users/register",
 					type : "put",
 					contentType : 'application/json',
 					success : function(response) {

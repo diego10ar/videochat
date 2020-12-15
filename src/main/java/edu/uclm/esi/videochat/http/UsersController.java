@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.uclm.esi.videochat.model.Manager;
@@ -21,6 +22,7 @@ import edu.uclm.esi.videochat.springdao.UserRepository;
 
 
 @RestController
+@RequestMapping("users")
 public class UsersController {
 	
 	@Autowired
@@ -36,7 +38,7 @@ public class UsersController {
 		if (user==null)
 			throw new Exception("Incorrect login");
 		Manager.get().add(user);
-		request.getSession().setAttribute("user", user);
+		request.getSession().setAttribute("userName", user.getName());
 		Manager.get().add(request.getSession());
 		return user;
 	}

@@ -68,7 +68,7 @@ public class WebSocketGenerico extends TextWebSocketHandler {
 			JSONObject jsoMessage = new JSONObject();
 			jsoMessage.put("type", "FOR ALL");
 			jsoMessage.put("time", System.currentTimeMillis());
-			jsoMessage.put("message", jso.getString("texto"));
+			jsoMessage.put("message", jso.getString("message"));
 			broadcast(jsoMessage);
 			Message mensaje = new Message();
 			mensaje.setMessage(jso.getString("texto"));
@@ -89,18 +89,6 @@ public class WebSocketGenerico extends TextWebSocketHandler {
 			mensaje.setMessage(jso.getString("texto"));
 			mensaje.setSender(enviador);
 			guardarMensaje(mensaje);
-		} else if (type.equals("SOLICITUD_VIDEO")) {
-			String destinatario = jso.getString("destinatario");
-			WrapperSession wrapper = this.sessions.get(session.getId());
-			User remitente = wrapper.getUser();
-			User user = Manager.get().findUser(destinatario);
-			WebSocketSession navegadorDelDestinatario = user.getSession();
-			this.send(navegadorDelDestinatario, "type", "SOLICITUD_VIDEO", "remitente", remitente.getName());
-		} else if (type.equals("RECHAZO")) {
-			String destinatario = jso.getString("destinatario");
-			User user = Manager.get().findUser(destinatario);
-			WebSocketSession navegadorDeDestinatario = user.getSession();
-			this.send(navegadorDeDestinatario, "type", "RECHAZO");
 		}
 	}
 

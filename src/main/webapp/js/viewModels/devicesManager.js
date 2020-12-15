@@ -18,7 +18,9 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 			]);
 			
 			this.tracksDeAudio = ko.observableArray([]);
-			this.tracksDeVideo = ko.observableArray([]);			
+			this.tracksDeVideo = ko.observableArray([]);
+			
+			this.streamLocal = ko.observable();
 			
 			this.headerConfig = ko.observable({'view':[], 'viewModel' : null});
 			
@@ -63,8 +65,9 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 			var self = this;
 			navigator.mediaDevices.getUserMedia(caracteristicasBuscadas).
 				then(function(stream) {
-					var widgetVideo = document.getElementById("widgetVideo");
-					widgetVideo.srcObject = stream;
+					//var widgetVideo = document.getElementById("widgetVideo");
+					//widgetVideo.srcObject = stream;
+					self.streamLocal(stream);
 					self.inspeccionar(stream);
 				});
 		}
@@ -87,7 +90,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 			// Implement if needed
 		};
 
-		transitionCompleted = function() {
+		transitionCompleted() {
 			// Implement if needed
 		};
 	}

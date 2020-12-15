@@ -54,7 +54,8 @@
 				</div>
 				
 				<div>
-					<video id="widgetVideo" playsinline autoplay controls></video>
+					<video id="widgetVideo" playsinline autoplay controls
+						data-bind="attr : { srcObject : streamLocal }"></video>
 				</div>
 				
 				<!-- ko if : tracksDeAudio().length>0 -->

@@ -1,5 +1,7 @@
 package edu.uclm.esi.videochat.springdao;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -14,5 +16,5 @@ public interface UserRepository extends CrudRepository <User, String> {
 
 	
 	public User findByNameAndPwd(String name, String pwd);
-	public User findByName(String name);
+	public Optional<User> findByName(String name);
 }

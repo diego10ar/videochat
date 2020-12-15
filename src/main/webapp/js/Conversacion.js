@@ -1,9 +1,10 @@
 class Conversacion {
-	constructor(ko, nombreInterlocutor, ws) {
+	constructor(ko, nombreInterlocutor, ws, videoLlamada) {
 		this.nombreInterlocutor = nombreInterlocutor;
 		this.mensajes = ko.observableArray([]);
 		this.textoAEnviar = ko.observable("");
 		this.ws = ws;
+		this.videoLlamada = videoLlamada;
 		this.visible = ko.observable(true);
 	}
 	
@@ -16,7 +17,8 @@ class Conversacion {
 			type : "SOLICITUD_VIDEO",
 			destinatario : this.nombreInterlocutor
 		};
-		this.ws.send(JSON.stringify(mensaje));
+		this.videoLlamada.isInitiator = true; 
+		this.videoLlamada.ws.send(JSON.stringify(mensaje));
 	}
 	
 	enviar() {

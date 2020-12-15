@@ -1,13 +1,3 @@
-/**
- * @license
- * Copyright (c) 2014, 2020, Oracle and/or its affiliates.
- * Licensed under The Universal Permissive License (UPL), Version 1.0
- * as shown at https://oss.oracle.com/licenses/upl/
- * @ignore
- */
-/*
- * Your application specific code will go here
- */
 define(['knockout', 'ojs/ojcorerouter', 'ojs/ojmodulerouter-adapter', 'ojs/ojknockoutrouteradapter', 'ojs/ojurlparamadapter', 'ojs/ojthemeutils', 'ojs/ojmodule-element-utils', 'ojs/ojmoduleanimations', 'ojs/ojarraydataprovider', 'ojs/ojknockouttemplateutils', 'ojs/ojknockout', 'ojs/ojmodule-element'],
   function(ko, CoreRouter, ModuleRouterAdapter, KnockoutRouterAdapter, UrlParamAdapter, ThemeUtils, moduleUtils, ModuleAnimations, ArrayDataProvider, KnockoutTemplateUtils) {
      function ControllerViewModel() {
@@ -35,7 +25,8 @@ define(['knockout', 'ojs/ojcorerouter', 'ojs/ojmodulerouter-adapter', 'ojs/ojkno
         { path: '', redirect: 'login' },
         { path: 'login', detail: { label: 'Login', iconClass: 'oj-ux-ico-bar-chart' } },
         { path: 'chat', detail: { label: 'Chat', iconClass: 'oj-ux-ico-fire' } },
-        { path: 'customers', detail: { label: 'Customers', iconClass: 'oj-ux-ico-contact-group' } },
+        { path: 'ejemplo', detail: { label: 'Ejemplo', iconClass: 'oj-ux-ico-contact-group' } },
+        { path: 'ejemplo2', detail: { label: 'Ejemplo', iconClass: 'oj-ux-ico-contact-group' } },
         { path: 'register', detail: { label: 'Creación de cuenta', iconClass: 'oj-ux-ico-contact' } },
         { path: 'devicesManager', detail: { label: 'Gestor de dispositivos', iconClass: 'oj-ux-ico-information-s' } }
       ];
