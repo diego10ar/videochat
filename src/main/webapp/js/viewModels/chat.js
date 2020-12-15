@@ -26,23 +26,6 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 			getUsuariosConectados();			
 		};
 
-		self.setRecipient = function(interlocutor) {
-			self.recipient(interlocutor);
-			var conversacion = buscarConversacion(interlocutor.nombre);
-			if (conversacion==null) {
-				conversacion = new Conversacion(ko, interlocutor.nombre, self.chat, self.videoLlamada);
-				self.conversaciones.push(conversacion);
-			}
-			ponerVisible(interlocutor.nombre);
-		}
-
-		function ponerVisible(nombreInterlocutor) {
-			for (var i=0; i<self.conversaciones().length; i++) {
-				var conversacion = self.conversaciones()[i];
-				conversacion.visible(conversacion.nombreInterlocutor == nombreInterlocutor);
-			}
-		}
-
 		function getUsuariosConectados() {
 			var data = {	
 				url : "users/getUsuariosConectados",
@@ -63,7 +46,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 		}
 		
 		self.disconnected = function() {
-			self.chat.close();
+			self.chat().close();
 		};
 
 		self.transitionCompleted = function() {

@@ -38,7 +38,7 @@ public class UsersController {
 		if (user==null)
 			throw new Exception("Incorrect login");
 		Manager.get().add(user);
-		request.getSession().setAttribute("userName", user.getName());
+		request.getSession().setAttribute("user", user);
 		Manager.get().add(request.getSession());
 		return user;
 	}

@@ -1,15 +1,17 @@
 class Chat {
 	constructor(ko) {
 		let self = this;
+		this.ko = ko;
 		
 		this.estado = ko.observable();
 		this.usuarios = ko.observableArray([]);
 		this.mensajesRecibidos = ko.observableArray([]);
 		this.conversaciones = ko.observableArray([]);
 		
+		this.destinatario = ko.observable();
 		this.mensajeQueVoyAEnviar = ko.observable();
 		
-		this.chat = new WebSocket("wss://" + window.location.host + "/wsGenerico");
+		this.chat = new WebSocket("wss://" + window.location.host + "/wsTexto");
 		
 		this.chat.onopen = function() {
 			self.estado("Conectado al servidor");
@@ -32,23 +34,31 @@ class Chat {
 					}
 				}
 			} else if (data.type == "PARTICULAR") {
-				var conversacionActual = buscarConversacion(data.remitente);
+				var conversacionActual = self.buscarConversacion(data.remitente);
 				if (conversacionActual!=null) {
 					var mensaje = new Mensaje(data.message.message, data.message.time);
 					conversacionActual.addMensaje(mensaje);
 				} else {
-					conversacionActual = new Conversacion(ko, data.remitente, self.chat, self.videoLlamada);
+					conversacionActual = new Conversacion(ko, data.remitente, self, self.videoLlamada);
 					var mensaje = new Mensaje(data.message.message, data.message.time);
 					conversacionActual.addMensaje(mensaje);
 					self.conversaciones.push(conversacionActual);
 				}
-				ponerVisible(data.remitente);
+				self.ponerVisible(data.remitente);
 			} 
 		}
 
 		this.chat.onclose = function() {
 			self.estado("WebSocket cerrado");
 		}
+	}
+	
+	close() {
+		this.chat.close();
+	}
+	
+	enviar(mensaje) {
+		this.chat.send(JSON.stringify(mensaje));
 	}
 	
 	enviarATodos(mensaje) {
@@ -65,6 +75,16 @@ class Chat {
 				return this.conversaciones()[i];
 		}
 		return null;
+	}
+	
+	setDestinatario(interlocutor) {
+		this.destinatario(interlocutor);
+		var conversacion = this.buscarConversacion(interlocutor.nombre);
+		if (conversacion==null) {
+			conversacion = new Conversacion(this.ko, interlocutor.nombre, this, self.videoLlamada);
+			this.conversaciones.push(conversacion);
+		}
+		this.ponerVisible(interlocutor.nombre);
 	}
 	
 	ponerVisible(nombreInterlocutor) {

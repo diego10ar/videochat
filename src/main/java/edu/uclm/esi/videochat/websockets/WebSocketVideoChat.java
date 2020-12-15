@@ -1,7 +1,9 @@
 package edu.uclm.esi.videochat.websockets;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -9,8 +11,6 @@ import javax.servlet.http.HttpSession;
 
 import org.json.JSONObject;
 import org.springframework.http.HttpHeaders;
-import org.springframework.stereotype.Component;
-import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketMessage;
@@ -18,14 +18,14 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import edu.uclm.esi.videochat.model.Manager;
-import edu.uclm.esi.videochat.model.Message;
 import edu.uclm.esi.videochat.model.User;
 
-
-@Component
-public class WebSocketGenerico extends TextWebSocketHandler {
-	private ConcurrentHashMap<String, WrapperSession> sessions = new ConcurrentHashMap<>();
+public abstract class WebSocketVideoChat extends TextWebSocketHandler {
+	protected ConcurrentHashMap<String, WrapperSession> sessionsByUserName = new ConcurrentHashMap<>();
+	protected ConcurrentHashMap<String, WrapperSession> sessionsById = new ConcurrentHashMap<>();
 	
+	protected SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy, HH:mm:ss");
+	 
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 		session.setBinaryMessageSizeLimit(1000*1024*1024);
@@ -42,10 +42,15 @@ public class WebSocketGenerico extends TextWebSocketHandler {
 		this.broadcast(mensaje);
 		
 		WrapperSession wrapper = new WrapperSession(session, user);
-		this.sessions.put(session.getId(), wrapper);
+		this.sessionsByUserName.put(user.getName(), wrapper);
+		this.sessionsById.put(session.getId(), wrapper);
+	}
+	
+	protected String formatDate(long millis) {
+		return sdf.format(new Date(millis));
 	}
 
-	private User getUser(WebSocketSession session) {
+	protected User getUser(WebSocketSession session) {
 		HttpHeaders headers = session.getHandshakeHeaders();
 		List<String> cookies = headers.get("cookie");
 		for (String cookie : cookies) {
@@ -57,86 +62,41 @@ public class WebSocketGenerico extends TextWebSocketHandler {
 		return null;
 	}
 
-	@Override
-	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-		JSONObject jso = new JSONObject(message.getPayload());
-		String type = jso.getString("type");
-		
-		String enviador = getUser(session).getName();
-		
-		if (type.equals("BROADCAST")) {
-			JSONObject jsoMessage = new JSONObject();
-			jsoMessage.put("type", "FOR ALL");
-			jsoMessage.put("time", System.currentTimeMillis());
-			jsoMessage.put("message", jso.getString("message"));
-			broadcast(jsoMessage);
-			Message mensaje = new Message();
-			mensaje.setMessage(jso.getString("texto"));
-			mensaje.setSender(enviador);
-			guardarMensaje(mensaje);
-		} else if (type.equals("PARTICULAR")) {
-			String destinatario = jso.getString("destinatario");
-			User user = Manager.get().findUser(destinatario);
-			WebSocketSession navegadorDelDestinatario = user.getSession();
-			
-			JSONObject jsoMessage = new JSONObject();
-			jsoMessage.put("time", System.currentTimeMillis());
-			jsoMessage.put("message", jso.get("texto"));
-			
-			this.send(navegadorDelDestinatario, "type", "PARTICULAR",
-					"remitente", enviador, "message", jsoMessage);
-			Message mensaje = new Message();
-			mensaje.setMessage(jso.getString("texto"));
-			mensaje.setSender(enviador);
-			guardarMensaje(mensaje);
-		}
-	}
-
-	private void guardarMensaje(Message mensaje) {
-		Manager.get().getMessageRepo().save(mensaje);
-		
-	}
-	private void broadcast(JSONObject jsoMessage) {
+	protected void broadcast(JSONObject jsoMessage) {
 		TextMessage message = new TextMessage(jsoMessage.toString());
-		Collection<WrapperSession> wrappers = this.sessions.values();
+		Collection<WrapperSession> wrappers = this.sessionsById.values();
 		for (WrapperSession wrapper : wrappers) {
 			try {
 				wrapper.getSession().sendMessage(message);
 			} catch (IOException e) {
-				this.sessions.remove(wrapper.getSession().getId());
+				System.err.println("//TODO : ");
 			}
 		}
 	}
 	
-	private void broadcast(String... values) {
+	protected void broadcast(String... values) {
 		JSONObject jsoMessage = new JSONObject();
 		for (int i=0; i<values.length; i=i+2) {
 			jsoMessage.put(values[i], values[i+1]);
 		}
 		TextMessage message = new TextMessage(jsoMessage.toString());
-		Collection<WrapperSession> wrappers = this.sessions.values();
+		Collection<WrapperSession> wrappers = this.sessionsById.values();
 		for (WrapperSession wrapper : wrappers) {
 			try {
 				wrapper.getSession().sendMessage(message);
 			} catch (IOException e) {
-				this.sessions.remove(wrapper.getSession().getId());
+				//this.sessions.remove(wrapper.getSession().getId());
+				System.err.println("//TODO");
 			}
 		}
 	}
 	
 	@Override
-	protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) {
-		session.setBinaryMessageSizeLimit(1000*1024*1024);
-		
-		byte[] payload = message.getPayload().array();
-		System.out.println("La sesión " + session.getId() + " manda un binario de " + payload.length + " bytes");
-	}
-	
-	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-		WrapperSession wrapper = this.sessions.remove(session.getId());
-		Manager.get().remove(wrapper.getUser());
-		this.broadcast("type", "BYE", "userName", wrapper.getUser().getName());
+		//WrapperSession wrapper = this.sessions.remove(session.getId());
+		//Manager.get().remove(wrapper.getUser());
+		//this.broadcast("type", "BYE", "userName", wrapper.getUser().getName());
+		System.err.println("//TODO: afterConnectionClosed");
 	}
 	
 	@Override
@@ -144,7 +104,7 @@ public class WebSocketGenerico extends TextWebSocketHandler {
 		exception.printStackTrace();
 	}
 	
-	private void send(WebSocketSession session, Object... typesAndValues) {
+	protected void send(WebSocketSession session, Object... typesAndValues) {
 		JSONObject jso = new JSONObject();
 		int i=0;
 		while (i<typesAndValues.length) {

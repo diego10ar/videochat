@@ -36,7 +36,7 @@
 										<!-- ko if : foto -->
 											<img data-bind="attr : { src : foto }" width="30" height="30">
 										<!-- /ko -->
-										<a data-bind="html : nombre, click : $parent.setRecipient"></a>
+										<a data-bind="html : nombre, click : function() { $parent.setDestinatario($data); }"></a>
 									</div>
 									<!-- /ko -->						
 								</div>

@@ -8,11 +8,11 @@ import org.springframework.web.socket.server.support.HttpSessionHandshakeInterce
 
 @Configuration
 @EnableWebSocket
-public class WebSocketGenericoConfigurer implements WebSocketConfigurer {
+public class WebSocketTextoConfigurer implements WebSocketConfigurer {
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
 		registry.
-			addHandler(new WebSocketGenerico(), "/wsGenerico").
+			addHandler(new WebSocketTexto(), "/wsTexto").
 			setAllowedOrigins("*").
 			addInterceptors(new HttpSessionHandshakeInterceptor());
 	}

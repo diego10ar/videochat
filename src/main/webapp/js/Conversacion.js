@@ -1,9 +1,9 @@
 class Conversacion {
-	constructor(ko, nombreInterlocutor, ws, videoLlamada) {
+	constructor(ko, nombreInterlocutor, chat, videoLlamada) {
 		this.nombreInterlocutor = nombreInterlocutor;
 		this.mensajes = ko.observableArray([]);
 		this.textoAEnviar = ko.observable("");
-		this.ws = ws;
+		this.chat = chat;
 		this.videoLlamada = videoLlamada;
 		this.visible = ko.observable(true);
 	}
@@ -18,7 +18,7 @@ class Conversacion {
 			destinatario : this.nombreInterlocutor
 		};
 		this.videoLlamada.isInitiator = true; 
-		this.videoLlamada.ws.send(JSON.stringify(mensaje));
+		this.videoLlamada.chat.send(JSON.stringify(mensaje));
 	}
 	
 	enviar() {
@@ -27,7 +27,7 @@ class Conversacion {
 			destinatario : this.nombreInterlocutor,
 			texto : this.textoAEnviar()
 		};
-		this.ws.send(JSON.stringify(mensaje));
+		this.chat.enviar(mensaje);
 		var mensaje = new Mensaje(this.textoAEnviar());
 		this.addMensaje(mensaje);
 	}
