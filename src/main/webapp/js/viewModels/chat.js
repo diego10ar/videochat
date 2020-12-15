@@ -9,7 +9,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 		self.estado = ko.observable("No conectado");
 		self.error = ko.observable("");
 
-		self.recipient = ko.observable("");
+		self.recipient = ko.observable();
 
 		self.chat = ko.observable(new Chat(ko));
 		
@@ -43,6 +43,10 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 				}
 			};
 			$.ajax(data);
+		}
+		
+		self.solicitarVideo = function() {
+			
 		}
 		
 		self.disconnected = function() {

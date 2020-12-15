@@ -65,7 +65,7 @@
 									<button data-bind="click : enviar">
 										<span>Enviar</span>
 									</button>
-									<button data-bind="click : solicitarVideo">Solicitar vídeo</button>
+									<button data-bind="click : $parents[$parents.length-1].solicitarVideo">Solicitar vídeo</button>
 									<!-- ko foreach : mensajes -->
 									<div>
 										<span data-bind="html : hora"></span>:

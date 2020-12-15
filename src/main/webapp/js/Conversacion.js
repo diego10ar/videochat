@@ -1,24 +1,14 @@
 class Conversacion {
-	constructor(ko, nombreInterlocutor, chat, videoLlamada) {
+	constructor(ko, nombreInterlocutor, chat) {
 		this.nombreInterlocutor = nombreInterlocutor;
 		this.mensajes = ko.observableArray([]);
 		this.textoAEnviar = ko.observable("");
 		this.chat = chat;
-		this.videoLlamada = videoLlamada;
 		this.visible = ko.observable(true);
 	}
 	
 	addMensaje(mensaje) {
 		this.mensajes.push(mensaje);
-	}
-	
-	solicitarVideo() {
-		var mensaje = {
-			type : "SOLICITUD_VIDEO",
-			destinatario : this.nombreInterlocutor
-		};
-		this.videoLlamada.isInitiator = true; 
-		this.videoLlamada.chat.send(JSON.stringify(mensaje));
 	}
 	
 	enviar() {

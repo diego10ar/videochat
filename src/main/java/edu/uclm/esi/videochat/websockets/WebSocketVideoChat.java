@@ -85,18 +85,27 @@ public abstract class WebSocketVideoChat extends TextWebSocketHandler {
 			try {
 				wrapper.getSession().sendMessage(message);
 			} catch (IOException e) {
-				//this.sessions.remove(wrapper.getSession().getId());
-				System.err.println("//TODO");
+				remove(wrapper);
 			}
 		}
 	}
 	
+	private void remove(WrapperSession wrapper) {
+		Manager.get().remove(wrapper.getUser());
+		this.sessionsById.remove(wrapper.getSession().getId());
+		this.sessionsByUserName.remove(wrapper.getUser().getName());
+		this.broadcast("type", "BYE", "userName", wrapper.getUser().getName());
+	}
+	
+	private void remove(WebSocketSession session) {
+		WrapperSession wrapper = this.sessionsById.get(session.getId());
+		this.remove(wrapper);
+	}
+
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-		//WrapperSession wrapper = this.sessions.remove(session.getId());
-		//Manager.get().remove(wrapper.getUser());
-		//this.broadcast("type", "BYE", "userName", wrapper.getUser().getName());
-		System.err.println("//TODO: afterConnectionClosed");
+		WrapperSession wrapper = this.sessionsById.get(session.getId());
+		this.remove(wrapper);
 	}
 	
 	@Override
@@ -115,8 +124,7 @@ public abstract class WebSocketVideoChat extends TextWebSocketHandler {
 		try {
 			session.sendMessage(wsMessage);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			this.remove(session);
 		}
 	}
 }

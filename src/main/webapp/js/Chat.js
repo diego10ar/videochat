@@ -39,7 +39,7 @@ class Chat {
 					var mensaje = new Mensaje(data.message.message, data.message.time);
 					conversacionActual.addMensaje(mensaje);
 				} else {
-					conversacionActual = new Conversacion(ko, data.remitente, self, self.videoLlamada);
+					conversacionActual = new Conversacion(ko, data.remitente, self);
 					var mensaje = new Mensaje(data.message.message, data.message.time);
 					conversacionActual.addMensaje(mensaje);
 					self.conversaciones.push(conversacionActual);
@@ -81,7 +81,7 @@ class Chat {
 		this.destinatario(interlocutor);
 		var conversacion = this.buscarConversacion(interlocutor.nombre);
 		if (conversacion==null) {
-			conversacion = new Conversacion(this.ko, interlocutor.nombre, this, self.videoLlamada);
+			conversacion = new Conversacion(this.ko, interlocutor.nombre, this);
 			this.conversaciones.push(conversacion);
 		}
 		this.ponerVisible(interlocutor.nombre);

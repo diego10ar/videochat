@@ -1,7 +1,7 @@
 define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 		function(ko, app, moduleUtils, accUtils) {
 
-	function EjemploViewModel() {
+	function VideoConferenciaViewModel() {
 		var self = this;
 
 		this.ws = new WebSocket("wss://" + window.location.host + "/wsSignaling2");
@@ -238,6 +238,6 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 		};
 	}
 
-	return EjemploViewModel;
+	return VideoConferenciaViewModel;
 }
 );
