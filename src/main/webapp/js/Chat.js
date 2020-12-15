@@ -3,7 +3,9 @@ class Chat {
 		let self = this;
 		this.ko = ko;
 		
-		this.estado = ko.observable();
+		this.estado = ko.observable("Mierda");
+		this.error = ko.observable();
+		
 		this.usuarios = ko.observableArray([]);
 		this.mensajesRecibidos = ko.observableArray([]);
 		this.conversaciones = ko.observableArray([]);
@@ -14,7 +16,18 @@ class Chat {
 		this.chat = new WebSocket("wss://" + window.location.host + "/wsTexto");
 		
 		this.chat.onopen = function() {
-			self.estado("Conectado al servidor");
+			self.estado("Conectado al chat de texto");
+			self.error("");
+		}
+
+		this.chat.onerror = function() {
+			self.estado("");
+			self.error("Chat de texto cerrado");
+		}
+
+		this.chat.onclose = function() {
+			self.estado("");
+			self.error("Chat de texto cerrado");
 		}
 		
 		this.chat.onmessage = function(event) {
@@ -46,10 +59,6 @@ class Chat {
 				}
 				self.ponerVisible(data.remitente);
 			} 
-		}
-
-		this.chat.onclose = function() {
-			self.estado("WebSocket cerrado");
 		}
 	}
 	

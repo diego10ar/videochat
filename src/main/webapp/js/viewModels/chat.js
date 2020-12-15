@@ -6,13 +6,17 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 		
 		this.user = app.user;
 		
-		self.estado = ko.observable("No conectado");
-		self.error = ko.observable("");
-
 		self.recipient = ko.observable();
 
 		self.chat = ko.observable(new Chat(ko));
 		
+		self.videoChat = ko.observable(new VideoChat(ko));
+
+		self.estadoChatDeTexto = self.chat().estado;
+		self.estadoSignaling = self.videoChat().estado;
+		self.errorChatDeTexto = self.chat().error;
+		self.errorSignaling = self.videoChat().error;
+
 		// Header Config
 		self.headerConfig = ko.observable({'view':[], 'viewModel':null});
 		moduleUtils.createView({'viewPath':'views/header.html'}).then(function(view) {
@@ -45,8 +49,16 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 			$.ajax(data);
 		}
 		
-		self.solicitarVideo = function() {
-			
+		self.encenderVideoLocal = function() {
+			self.videoChat().encenderVideoLocal();
+		}
+		
+		self.crearConexion = function() {
+			self.videoChat().crearConexion();
+		}
+
+		self.enviarOferta = function(destinatario) {
+			self.videoChat().enviarOferta(destinatario.nombre);
 		}
 		
 		self.disconnected = function() {

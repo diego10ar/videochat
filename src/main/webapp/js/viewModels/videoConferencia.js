@@ -4,7 +4,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 	function VideoConferenciaViewModel() {
 		var self = this;
 
-		this.ws = new WebSocket("wss://" + window.location.host + "/wsSignaling2");
+		this.ws = new WebSocket("wss://" + window.location.host + "/wsSignaling");
 		prepararWebSocket();
 		
 		this.mensajes = ko.observableArray([]);
@@ -79,7 +79,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 						
 			this.addMensaje("Llamada aceptada", "black");
 			this.addMensaje("Creando respuesta mediante el servidor Stun");
-			// Asumimos que se acepta
+			
 			let sdpConstraints = {};
 			this.conexion.createAnswer(
 				function(sessionDescription) {

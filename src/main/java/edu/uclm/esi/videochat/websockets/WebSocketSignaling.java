@@ -38,6 +38,37 @@ public class WebSocketSignaling extends TextWebSocketHandler {
 		System.out.println(user.getName() + "-> " + session.getId());
 	}
 
+	@Override
+	protected void handleTextMessage(WebSocketSession navegadorDelRemitente, TextMessage message) throws Exception {
+		JSONObject jso = new JSONObject(message.getPayload());
+		String type = jso.getString("type");
+		
+		User remitente = this.sessionsById.get(navegadorDelRemitente.getId()).getUser();
+		String nombreRemitente = remitente.getName();
+		
+		String recipient = jso.optString("recipient");
+		WebSocketSession navegadorDelDestinatario = null;
+		
+		if (recipient.length()>0)
+			navegadorDelDestinatario = this.sessionsByUserName.get(recipient).getSession();
+
+		if (type.equals("OFFER")) {
+			VideoRoom videoRoom = new VideoRoom(navegadorDelRemitente, navegadorDelDestinatario);
+			this.videoRooms.put("1", videoRoom);
+			this.send(navegadorDelDestinatario, "type", "OFFER", "remitente", nombreRemitente, "sessionDescription", jso.get("sessionDescription"));
+			return;
+		}
+		if (type.equals("ANSWER")) {
+			VideoRoom videoRoom = this.videoRooms.get("1");
+			this.send(videoRoom.getA(), "type", "ANSWER", "sessionDescription", jso.get("sessionDescription"));
+			return;
+		}
+		if (type.equals("CANDIDATE")) {
+			VideoRoom videoRoom = this.videoRooms.get("1");
+			videoRoom.broadcast("type", "CANDIDATE", "candidate", jso.get("candidate"));
+		}
+	}
+
 	private User getUser(WebSocketSession session) {
 		HttpHeaders headers = session.getHandshakeHeaders();
 		List<String> cookies = headers.get("cookie");
@@ -48,55 +79,6 @@ public class WebSocketSignaling extends TextWebSocketHandler {
 			return (User) httpSession.getAttribute("user");
 		}
 		return null;
-	}
-
-	@Override
-	protected void handleTextMessage(WebSocketSession navegadorDelRemitente, TextMessage message) throws Exception {
-		JSONObject jso = new JSONObject(message.getPayload());
-		String type = jso.getString("type");
-		
-		WrapperSession wrapperRemitente = this.sessionsById.get(navegadorDelRemitente.getId());
-		User remitente = wrapperRemitente.getUser();
-		String nombreRemitente = remitente.getName();
-		
-		String nombreDestinatario = jso.optString("destinatario");
-		WrapperSession wrapperDestinatario = null;
-		WebSocketSession navegadorDelDestinatario = null;
-		if (nombreDestinatario.length()>0) {
-			wrapperDestinatario = this.sessionsByUserName.get(nombreDestinatario);
-			navegadorDelDestinatario = wrapperDestinatario.getSession();
-		}
-		
-		String sala = jso.optString("sala");
-
-		if (type.equals("CONECTAR_A_SALA")) {
-			VideoRoom videoRoom = this.videoRooms.get(sala);
-			if (videoRoom==null) {
-				videoRoom = new VideoRoom(navegadorDelRemitente, null);
-				this.videoRooms.put(sala, videoRoom);
-				this.send(navegadorDelRemitente, "type", "SALA_CREADA");
-			} else {
-				videoRoom.setB(navegadorDelRemitente);
-				videoRoom.broadcast("type", "SALA_COMPLETA");
-			}
-			return;
-		} 
-		if (type.equals("VIDEO_LOCAL_CONECTADO")) {
-			VideoRoom videoRoom = this.videoRooms.get(sala);
-			videoRoom.broadcast("type", "VIDEO_LOCAL_CONECTADO");
-			return;
-		}
-		if (type.equals("CANDIDATE")) {
-			VideoRoom videoRoom = this.videoRooms.get(sala);
-			videoRoom.broadcastString(jso.toString());
-			return;
-		}
-		if (type.equals("SESSION_DESCRIPTION")) {
-			VideoRoom videoRoom = this.videoRooms.get(sala);
-			videoRoom.broadcastString(jso.getJSONObject("sessionDescription").toString());
-			return;
-		}
-		
 	}
 	
 	@Override
