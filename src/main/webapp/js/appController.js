@@ -25,7 +25,6 @@ define(['knockout', 'ojs/ojcorerouter', 'ojs/ojmodulerouter-adapter', 'ojs/ojkno
         { path: '', redirect: 'login' },
         { path: 'login', detail: { label: 'Login', iconClass: 'oj-ux-ico-bar-chart' } },
         { path: 'chat', detail: { label: 'Chat', iconClass: 'oj-ux-ico-fire' } },
-        { path: 'videoConferencia', detail: { label: 'Videoconferencia', iconClass: 'oj-ux-ico-contact-group' } },
         { path: 'register', detail: { label: 'Creación de cuenta', iconClass: 'oj-ux-ico-contact' } },
         { path: 'devicesManager', detail: { label: 'Gestor de dispositivos', iconClass: 'oj-ux-ico-information-s' } }
       ];

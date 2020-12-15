@@ -3,7 +3,7 @@ class Chat {
 		let self = this;
 		this.ko = ko;
 		
-		this.estado = ko.observable("Mierda");
+		this.estado = ko.observable("");
 		this.error = ko.observable();
 		
 		this.usuarios = ko.observableArray([]);
