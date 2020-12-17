@@ -20,6 +20,7 @@ public class User {
 	private String picture;
 	@Transient 
 	private WebSocketSession session;
+	private long confirmationDate;
 	
 	public User() {
 		this.id = UUID.randomUUID().toString();
@@ -73,5 +74,13 @@ public class User {
 	@JsonIgnore
 	public WebSocketSession getSession() {
 		return session;
+	}
+
+	public void setConfirmationDate(long date) {
+		this.confirmationDate = date;
+	}
+	
+	public long getSetConfirmationDate() {
+		return confirmationDate;
 	}
 }
