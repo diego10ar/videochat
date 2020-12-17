@@ -64,14 +64,20 @@ public abstract class WebSocketVideoChat extends TextWebSocketHandler {
 
 	protected void broadcast(JSONObject jsoMessage) {
 		TextMessage message = new TextMessage(jsoMessage.toString());
-		Collection<WrapperSession> wrappers = this.sessionsById.values();
-		for (WrapperSession wrapper : wrappers) {
-			try {
-				wrapper.getSession().sendMessage(message);
-			} catch (IOException e) {
-				System.err.println("//TODO : ");
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				Collection<WrapperSession> wrappers = WebSocketVideoChat.this.sessionsById.values();
+				for (WrapperSession wrapper : wrappers) {
+					try {
+						wrapper.getSession().sendMessage(message);
+					} catch (IOException e) {
+						System.err.println("//TODO : ");
+					}
+				}
 			}
-		}
+		};
+		new Thread(r).start();
 	}
 	
 	protected void broadcast(String... values) {
@@ -80,14 +86,20 @@ public abstract class WebSocketVideoChat extends TextWebSocketHandler {
 			jsoMessage.put(values[i], values[i+1]);
 		}
 		TextMessage message = new TextMessage(jsoMessage.toString());
-		Collection<WrapperSession> wrappers = this.sessionsById.values();
-		for (WrapperSession wrapper : wrappers) {
-			try {
-				wrapper.getSession().sendMessage(message);
-			} catch (IOException e) {
-				remove(wrapper);
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				Collection<WrapperSession> wrappers = WebSocketVideoChat.this.sessionsById.values();
+				for (WrapperSession wrapper : wrappers) {
+					try {
+						wrapper.getSession().sendMessage(message);
+					} catch (IOException e) {
+						remove(wrapper);
+					}
+				}
 			}
-		}
+		};
+		new Thread(r).start();
 	}
 	
 	private void remove(WrapperSession wrapper) {
@@ -105,7 +117,8 @@ public abstract class WebSocketVideoChat extends TextWebSocketHandler {
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
 		WrapperSession wrapper = this.sessionsById.get(session.getId());
-		this.remove(wrapper);
+		if (wrapper!=null)
+			this.remove(wrapper);
 	}
 	
 	@Override

@@ -182,7 +182,7 @@ class VideoChat {
 			self.addMensaje("self.conexion.onsignalingstatechange: " + self.conexion.signalingState, "DeepPink");
 		}
 	
-		this.conexion.onnegotiationneeded = async function(event) {
+		this.conexion.onnegotiationneeded = function(event) {
 			self.addMensaje("Negociación finalizada: self.conexion.onnegotiationneeded", "black");
 			self.addMensaje("Listo para enviar oferta", "black");
 		}
