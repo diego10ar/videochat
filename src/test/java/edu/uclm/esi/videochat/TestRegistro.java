@@ -57,7 +57,6 @@ public class TestRegistro {
 		System.setProperty("webdriver.gecko.driver", "/Users/macariopolousaola/Downloads/geckodriver");
 				
 		//cargarCaras();
-		
 	}
 
 	private void cargarCaras() throws Exception {
@@ -149,7 +148,7 @@ public class TestRegistro {
 	@Test
 	@Order(2)
 	public void login() {
-		int usuarios = 4;
+		int usuarios = 9;
 		SecureRandom dado = new SecureRandom();
 		ArrayList<String> nombres = new ArrayList<>();
 		
