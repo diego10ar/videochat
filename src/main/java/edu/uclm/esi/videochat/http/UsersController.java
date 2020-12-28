@@ -65,7 +65,7 @@ public class UsersController {
 		user.setEmail(email);
 		user.setName(name);
 		user.setPwd(pwd1);
-		user.setConfirmationDate(0);
+		user.setConfirmationDate(0l);
 		String picture = jso.optString("picture");
 		user.setPicture(picture);
 		userRepo.save(user);

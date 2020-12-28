@@ -53,8 +53,8 @@ public class TestRegistro {
 	
 	@Before
 	public void setUp() throws Exception {
-		System.setProperty("webdriver.chrome.driver", "/Users/macariopolousaola/Downloads/chromedriver");
-		System.setProperty("webdriver.gecko.driver", "/Users/macariopolousaola/Downloads/geckodriver");
+		System.setProperty("webdriver.chrome.driver", "/Users/macariopolousaola/chromedriver");
+		System.setProperty("webdriver.gecko.driver", "/Users/macariopolousaola/geckodriver");
 				
 		//cargarCaras();
 	}
@@ -148,7 +148,7 @@ public class TestRegistro {
 	@Test
 	@Order(2)
 	public void login() {
-		int usuarios = 9;
+		int usuarios = 2;
 		SecureRandom dado = new SecureRandom();
 		ArrayList<String> nombres = new ArrayList<>();
 		
@@ -168,7 +168,7 @@ public class TestRegistro {
 		
 		for (int i=0; i<usuarios; i++) {
 			ChromeOptions options = new ChromeOptions();
-			options.setCapability("--use-fake-ui-for-media-stream", true);
+			options.addArguments("--use-fake-ui-for-media-stream", "--disable-user-media-security");
 			
 			ChromeDriver driver = new ChromeDriver(options);
 			driver.manage().window().setSize(new Dimension(ancho, alto));

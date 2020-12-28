@@ -48,7 +48,11 @@
 						<div class="oj-sm-6">
 							<h4>Mensajes a todos</h4>
 							<!-- ko foreach : mensajesRecibidos -->
-							<div data-bind="html : $data"></div>
+							<div>
+								<strong data-bind="html : hora"></strong>
+								&nbsp;
+								<span data-bind="html : texto"></span>
+							</div>
 							<!-- /ko -->
 	
 							<input type="text" size="50" data-bind="value : mensajeQueVoyAEnviar">

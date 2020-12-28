@@ -33,7 +33,7 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 					app.router.go( { path : 'chat' } );
 				},
 				error : function(response) {
-					alert("Error: " + response.responseJSON.error);
+					console.log("Error: " + response.responseJSON.error);
 				}
 			};
 			$.ajax(data);

@@ -70,10 +70,10 @@ class Chat {
 		this.chat.send(JSON.stringify(mensaje));
 	}
 	
-	enviarATodos(mensaje) {
+	enviarATodos() {
 		var mensaje = {
 			type : "BROADCAST",
-			message : mensaje
+			message : this.mensajeQueVoyAEnviar()
 		};
 		this.chat.send(JSON.stringify(mensaje));
 	}

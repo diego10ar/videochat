@@ -28,7 +28,7 @@ public class WebSocketTexto extends WebSocketVideoChat {
 			jsoMessage.put("message", jso.getString("message"));
 			broadcast(jsoMessage);
 			Message mensaje = new Message();
-			mensaje.setMessage(jso.getString("texto"));
+			mensaje.setMessage(jso.getString("message"));
 			mensaje.setSender(enviador);
 			guardarMensaje(mensaje);
 		} else if (type.equals("PARTICULAR")) {
