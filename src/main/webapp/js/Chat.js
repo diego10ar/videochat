@@ -11,8 +11,9 @@ class Chat {
 		this.conversaciones = ko.observableArray([]);
 		
 		this.destinatario = ko.observable();
+		this.remitente=ko.observable();
 		this.mensajeQueVoyAEnviar = ko.observable();
-		
+		this.textoAEnviar = ko.observable();
 		this.chat = new WebSocket("wss://" + window.location.host + "/wsTexto");
 		
 		this.chat.onopen = function() {
@@ -31,13 +32,18 @@ class Chat {
 		}
 		
 		this.chat.onmessage = function(event) {
+			console.log("llego al onmessage")
+			
 			var data = JSON.parse(event.data);
+			var tipo=data.type;
+			console.log(tipo);
 			if (data.type == "FOR ALL") {
-				var mensaje = new Mensaje(data.message, data.time);
+				var mensaje = new Mensaje(data.nombreEnviador, data.message, data.time);
 				self.mensajesRecibidos.push(mensaje);
 			} else if (data.type == "ARRIVAL") {
 				var usuario = new Usuario(data.userName, data.picture);
 				self.usuarios.push(usuario);
+				
 			} else if (data.type == "BYE") {
 				var userName = data.userName;
 				for (var i=0; i<self.usuarios().length; i++) {
@@ -47,13 +53,24 @@ class Chat {
 					}
 				}
 			} else if (data.type == "PARTICULAR") {
+				var mess=data;
+				var remi=data.remitente;
+				console.log(mess);
+				console.log(remi);
+				console.log(data.message.remitente);
+				if(typeof remi =="undefined"){
+					console.log("no esta");
+					remi="YO:";
+				}
 				var conversacionActual = self.buscarConversacion(data.remitente);
 				if (conversacionActual!=null) {
-					var mensaje = new Mensaje(data.message.message, data.message.time);
+					
+					var mensaje = new Mensaje(remi, data.message.message, data.message.time);
 					conversacionActual.addMensaje(mensaje);
+					
 				} else {
 					conversacionActual = new Conversacion(ko, data.remitente, self);
-					var mensaje = new Mensaje(data.message.message, data.message.time);
+					var mensaje = new Mensaje(remi, data.message.message, data.message.time);
 					conversacionActual.addMensaje(mensaje);
 					self.conversaciones.push(conversacionActual);
 				}
@@ -67,7 +84,11 @@ class Chat {
 	}
 	
 	enviar(mensaje) {
+		//console.log("enviar(mensaje)");
+		//console.log(mensaje);
 		this.chat.send(JSON.stringify(mensaje));
+        document.getElementById("campoMensajePrivado").value = "";
+		
 	}
 	
 	enviarATodos() {
@@ -76,10 +97,12 @@ class Chat {
 			message : this.mensajeQueVoyAEnviar()
 		};
 		this.chat.send(JSON.stringify(mensaje));
+		document.getElementById("campoMensaje").value = "";
 	}
 	
 	buscarConversacion(nombreInterlocutor) {
 		for (var i=0; i<this.conversaciones().length; i++) {
+			console.log(this.conversaciones()[i].nombreInterlocutor);
 			if (this.conversaciones()[i].nombreInterlocutor==nombreInterlocutor)
 				return this.conversaciones()[i];
 		}

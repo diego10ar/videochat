@@ -1,5 +1,6 @@
 class Mensaje {
-	constructor(texto, hora) {
+	constructor(nombreEnviador, texto, hora) {
+		this.nombreEnviador = nombreEnviador;
 		this.texto = texto;
 		this.hora = hora ? hora : Date.now();
 	}

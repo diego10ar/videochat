@@ -15,7 +15,7 @@ import edu.uclm.esi.videochat.model.User;
 public class WebSocketTexto extends WebSocketVideoChat {
 	
 	@Override
-	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+	public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
 		JSONObject jso = new JSONObject(message.getPayload());
 		String type = jso.getString("type");
 		
@@ -26,6 +26,7 @@ public class WebSocketTexto extends WebSocketVideoChat {
 			jsoMessage.put("type", "FOR ALL");
 			jsoMessage.put("time", formatDate(System.currentTimeMillis()));
 			jsoMessage.put("message", jso.getString("message"));
+			jsoMessage.put("nombreEnviador", enviador);
 			broadcast(jsoMessage);
 			Message mensaje = new Message();
 			mensaje.setMessage(jso.getString("message"));
@@ -33,6 +34,9 @@ public class WebSocketTexto extends WebSocketVideoChat {
 			guardarMensaje(mensaje);
 		} else if (type.equals("PARTICULAR")) {
 			String destinatario = jso.getString("destinatario");
+			String texto=jso.getString("texto");
+			System.out.println("Aqui llego con mensaje= "+texto+" que se lo envio a "+destinatario);
+			
 			User user = Manager.get().findUser(destinatario);
 			WebSocketSession navegadorDelDestinatario = user.getSession();
 			
@@ -40,7 +44,13 @@ public class WebSocketTexto extends WebSocketVideoChat {
 			jsoMessage.put("time", formatDate(System.currentTimeMillis()));
 			jsoMessage.put("message", jso.get("texto"));
 			
-			this.send(navegadorDelDestinatario, "type", "PARTICULAR", "remitente", enviador, "message", jsoMessage);
+			JSONObject jsoMessage2 = new JSONObject();
+			jsoMessage2.put("type",  "PARTICULAR");
+			jsoMessage2.put("remitente", enviador);
+			jsoMessage2.put("message", jsoMessage);
+			
+			//this.send(navegadorDelDestinatario, "type", "PARTICULAR", "remitente", enviador, "message", jsoMessage);
+			this.broadcast2(destinatario, jsoMessage2);
 			Message mensaje = new Message();
 			mensaje.setMessage(jso.getString("texto"));
 			mensaje.setSender(enviador);

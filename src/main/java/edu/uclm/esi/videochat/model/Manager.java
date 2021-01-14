@@ -60,7 +60,10 @@ public class Manager {
 			User user = eUsers.nextElement();
 			user.setPwd(null);
 			users.add(user);
+			
+			
 		}
+		
 		return users;
 	}
 

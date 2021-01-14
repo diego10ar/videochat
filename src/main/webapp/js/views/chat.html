@@ -37,6 +37,7 @@
 							<!-- ko foreach : usuarios -->
 							<div>
 								<!-- ko if : foto -->
+								
 									<img data-bind="attr : { src : foto }" width="30" height="30">
 								<!-- /ko -->
 								<a data-bind="html : nombre, click : function() { $parent.setDestinatario($data); }"></a>
@@ -49,14 +50,16 @@
 							<h4>Mensajes a todos</h4>
 							<!-- ko foreach : mensajesRecibidos -->
 							<div>
+							    <strong style= "text-transform: uppercase; color: green;" data-bind="html : nombreEnviador"></strong>
 								<strong data-bind="html : hora"></strong>
 								&nbsp;
+								<strong>:</strong>
 								<span data-bind="html : texto"></span>
 							</div>
 							<!-- /ko -->
 	
-							<input type="text" size="50" data-bind="value : mensajeQueVoyAEnviar">
-							<button data-bind="click : enviarATodos">Enviar mensaje a todos</button>
+							<input id="campoMensaje" type="text" size="50" data-bind="value : mensajeQueVoyAEnviar">
+							<button  data-bind="click : enviarATodos">Enviar mensaje a todos</button>
 							<br>								
 						</div>
 					</div>
@@ -69,11 +72,12 @@
 								<!-- ko with : nombreInterlocutor -->
 								Chat con <span data-bind="html : $data"></span>
 								<!-- /ko -->
-								<input type="text" data-bind="value : textoAEnviar" placeholder="Texto de tu mensaje">
+								<input   id="campoMensajePrivado" type="text" data-bind="value : textoAEnviar" placeholder="Texto de tu mensaje">
 								<button data-bind="click : enviar">Enviar</button>
 	
 								<!-- ko foreach : mensajes -->
 								<div>
+								    <strong style= "text-transform: uppercase; color: green;" data-bind="html : nombreEnviador"></strong>
 									<span data-bind="html : hora"></span>:
 									<span data-bind="html : texto"></span>
 								</div>

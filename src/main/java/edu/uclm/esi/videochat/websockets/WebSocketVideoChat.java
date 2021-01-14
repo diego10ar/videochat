@@ -24,7 +24,7 @@ public abstract class WebSocketVideoChat extends TextWebSocketHandler {
 	protected ConcurrentHashMap<String, WrapperSession> sessionsByUserName = new ConcurrentHashMap<>();
 	protected ConcurrentHashMap<String, WrapperSession> sessionsById = new ConcurrentHashMap<>();
 	
-	protected SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy, HH:mm:ss");
+	protected SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yy, HH:mm:ss");
 	 
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -139,5 +139,24 @@ public abstract class WebSocketVideoChat extends TextWebSocketHandler {
 		} catch (IOException e) {
 			this.remove(session);
 		}
+	}
+	
+	protected void broadcast2(String destinatario, JSONObject jsoMessage) {
+		TextMessage message = new TextMessage(jsoMessage.toString());
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				Collection<WrapperSession> wrappers = WebSocketVideoChat.this.sessionsById.values();
+				for (WrapperSession wrapper : wrappers) {
+					try {
+						if(wrapper.getUser().getName().equals(destinatario))
+						wrapper.getSession().sendMessage(message);
+					} catch (IOException e) {
+						System.err.println("//TODO : ");
+					}
+				}
+			}
+		};
+		new Thread(r).start();
 	}
 }

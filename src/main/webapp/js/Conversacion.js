@@ -12,13 +12,15 @@ class Conversacion {
 	}
 	
 	enviar() {
+		var d = new Date();
+var de = d.getDate()+"-"+ d.getMonth()+1+"-"+d.getFullYear()+", "+d.getHours()+"-"+ d.getMinutes()+"-"+d.getSeconds();
 		var mensaje = {
 			type : "PARTICULAR",
 			destinatario : this.nombreInterlocutor,
 			texto : this.textoAEnviar()
 		};
 		this.chat.enviar(mensaje);
-		var mensaje = new Mensaje(this.textoAEnviar());
+		var mensaje = new Mensaje("YO", this.textoAEnviar(),de);
 		this.addMensaje(mensaje);
 	}
 }
