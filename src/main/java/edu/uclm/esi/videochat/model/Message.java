@@ -61,5 +61,13 @@ public class Message {
 		this.date = date;
 	}
 
+
+
+	@Override
+	public String toString() {
+		return "Message [id=" + id + ", sender=" + sender + ", recipient=" + recipient + ", message=" + message
+				+ ", date=" + date + "]";
+	}
+
 	
 }

@@ -5,11 +5,12 @@ class Chat {
 		
 		this.estado = ko.observable("");
 		this.error = ko.observable();
-		this.enviador=ko.observable();
+		//this.enviador=ko.observable();
 		this.usuarios = ko.observableArray([]);
 		this.mensajesRecibidos = ko.observableArray([]);
 		this.conversaciones = ko.observableArray([]);
-		this.Historialconversaciones = ko.observableArray([]);
+		this.histo=ko.observableArray([]);
+		this.conversacionesHistorial = ko.observableArray([]);
 		this.destinatario = ko.observable();
 		this.remitente=ko.observable();
 		this.mensajeQueVoyAEnviar = ko.observable();
@@ -64,7 +65,6 @@ class Chat {
 				}
 				var conversacionActual = self.buscarConversacion(data.remitente);
 				if (conversacionActual!=null) {
-					
 					var mensaje = new Mensaje(remi, data.message.message, data.message.time);
 					conversacionActual.addMensaje(mensaje);
 					
@@ -81,6 +81,7 @@ class Chat {
 				console.log(data.destinatario);
 				self.verHistorial2(data.enviador,data.destinatario);
 			}
+			
 			
 		}
 	}
@@ -114,6 +115,18 @@ class Chat {
 		}
 		return null;
 	}
+		buscarConversacionHistorial(enviador, solicitante) {
+		for (var i=0; i<this.conversacionesHistorial().length; i++) {
+			//console.log(this.conversaciones()[i].nombreInterlocutor);
+			if (this.conversacionesHistorial()[i].enviador==enviador && this.conversacionesHistorial()[i].remitente==solicitante ){
+				
+			}
+				
+				return this.conversacionesHistorial()[i];
+		}
+		console.log("retorno nulo porque no tengo nada de momenot");
+		return null;
+	}
 	
 	setDestinatario(interlocutor) {
 		this.destinatario(interlocutor);
@@ -137,14 +150,89 @@ class Chat {
 	}
 	
 	verHistorial2(env, dest){
-		//aqui tengo que obtener los mensajes de la bbdd siendo env = YO y dest la persona con las que me los he escrito
-	
+		self=this;
+			var info = {
+				env : env,
+				dest : dest
+			};
+		
+			$.ajax(
+						{
+				data : JSON.stringify(info),
+				url : "users/conversaciones",
+				type : "post",
+				contentType : 'application/json',
+				success : function(response) {
+					//console.log(response.length);
+					self.histo=response;
+				   	self.escribe(self.histo, env, dest);
+					
+					
+				},
+				error : function(response) {
+					console.log("Error: " + response.responseJSON.error);
+				}
+			}
+			);
+
+		
+			
+			
+			
+		}
+		escribe(histo, e,d){
+			
+			
+				var conversacionActual = self.buscarConversacionHistorial(e,d);
+				if (conversacionActual!=null) {
+					//conversacionActual.clearData();
+					console.log("ya tenía "+ conversacionActual.mensajesHis().length)
+					for (var i=conversacionActual.mensajesHis().length; i<histo.length; i++) {
+						var sender=histo[i].sender;
+						if(sender==e){
+							sender="Yo"
+						}
+						var mensaje = new Mensaje(sender, histo[i].message, histo[i].date);
+						conversacionActual.addMensaje(mensaje);
+					}
+				} else {
+					conversacionActual = new ConversacionHistorial(this.ko, e, d, self);
+					for (var i=0; i<histo.length; i++) {
+						var sender=histo[i].sender;
+						if(sender==e){
+							sender="Yo"
+						}
+						var mensaje = new Mensaje(sender, histo[i].message, histo[i].date);
+						//console.log(mensaje);
+						conversacionActual.addMensaje(mensaje);
+					}
+					self.conversacionesHistorial.push(conversacionActual);
+				}
+				self.ponerVisibleHistorial(e,d);
+			
+			
+			
 		}
 	ponerVisible(nombreInterlocutor) {
 		for (var i=0; i<this.conversaciones().length; i++) {
 			var conversacion = this.conversaciones()[i];
 			conversacion.visible(conversacion.nombreInterlocutor == nombreInterlocutor);
+			
 		}
+	}
+	ponerVisibleHistorial(e,d) {
+		console.log("lo pongo visible ")
+		
+		for (var i=0; i<this.conversacionesHistorial().length; i++) {
+				var conversacion = this.conversacionesHistorial()[i];
+			//console.log(this.conversaciones()[i].nombreInterlocutor);
+	
+			console.log(conversacion.enviador==e && conversacion.remitente==d);
+			console.log("tamanio de");
+			console.log(conversacion.mensajesHis.length);
+			conversacion.visibleHis(conversacion.enviador==e && conversacion.remitente==d);
+		}
+		
 	}
 	
 	addUsuario(userName, picture) {

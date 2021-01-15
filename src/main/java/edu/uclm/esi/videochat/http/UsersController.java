@@ -1,8 +1,10 @@
 package edu.uclm.esi.videochat.http;
 
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,8 +24,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import edu.uclm.esi.videochat.model.Email;
 import edu.uclm.esi.videochat.model.Manager;
+import edu.uclm.esi.videochat.model.Message;
 import edu.uclm.esi.videochat.model.Token;
 import edu.uclm.esi.videochat.model.User;
+import edu.uclm.esi.videochat.springdao.MessageRepository;
 import edu.uclm.esi.videochat.springdao.TokenRepository;
 import edu.uclm.esi.videochat.springdao.UserRepository;
 
@@ -34,6 +38,8 @@ public class UsersController {
 	
 	@Autowired
 	private UserRepository userRepo;
+	@Autowired
+	private MessageRepository msgRepo;
 	@Autowired
 	private TokenRepository tokenRepo;
 	
@@ -51,7 +57,18 @@ public class UsersController {
 		Manager.get().add(request.getSession());
 		return user;
 	}
-	
+	@PostMapping("/conversaciones")
+	public List<Message> conversaciones (HttpServletRequest request, @RequestBody Map<String, Object> datosConver) throws Exception {
+		JSONObject jso = new JSONObject(datosConver);
+		String sender=jso.getString("env");
+		String recipient=jso.getString("dest");
+		System.out.println("Llego al user controler con env= "+ sender+ " y dest= "+recipient);
+		List<Message> rs= (List<Message>) msgRepo.findByEnvAndDest(sender,recipient);
+		
+		System.out.println("size= "+rs.size());
+		return rs;
+		
+	}
 	@PutMapping("/register")
 	public void register(@RequestBody Map<String, Object> credenciales) throws Exception {
 		JSONObject jso = new JSONObject(credenciales);

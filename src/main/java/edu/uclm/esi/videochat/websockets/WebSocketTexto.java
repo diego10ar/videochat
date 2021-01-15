@@ -1,7 +1,11 @@
 package edu.uclm.esi.videochat.websockets;
 
+import java.util.List;
+
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -9,11 +13,14 @@ import org.springframework.web.socket.WebSocketSession;
 import edu.uclm.esi.videochat.model.Manager;
 import edu.uclm.esi.videochat.model.Message;
 import edu.uclm.esi.videochat.model.User;
+import edu.uclm.esi.videochat.springdao.MessageRepository;
 
 
 @Component
 public class WebSocketTexto extends WebSocketVideoChat {
-
+	@Autowired
+	private MessageRepository msgRepo;
+	
 	@Override
 	public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
 		JSONObject jso = new JSONObject(message.getPayload());
@@ -71,6 +78,7 @@ public class WebSocketTexto extends WebSocketVideoChat {
 
 			this.broadcast2(enviador, jsoMessage);
 		}
+	
 
 	}
 
