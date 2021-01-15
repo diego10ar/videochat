@@ -5,11 +5,11 @@ class Chat {
 		
 		this.estado = ko.observable("");
 		this.error = ko.observable();
-		
+		this.enviador=ko.observable();
 		this.usuarios = ko.observableArray([]);
 		this.mensajesRecibidos = ko.observableArray([]);
 		this.conversaciones = ko.observableArray([]);
-		
+		this.Historialconversaciones = ko.observableArray([]);
 		this.destinatario = ko.observable();
 		this.remitente=ko.observable();
 		this.mensajeQueVoyAEnviar = ko.observable();
@@ -76,6 +76,12 @@ class Chat {
 				}
 				self.ponerVisible(data.remitente);
 			} 
+			else if (data.type == "HISTO") {
+				console.log(data.enviador);
+				console.log(data.destinatario);
+				self.verHistorial2(data.enviador,data.destinatario);
+			}
+			
 		}
 	}
 	
@@ -102,7 +108,7 @@ class Chat {
 	
 	buscarConversacion(nombreInterlocutor) {
 		for (var i=0; i<this.conversaciones().length; i++) {
-			console.log(this.conversaciones()[i].nombreInterlocutor);
+			//console.log(this.conversaciones()[i].nombreInterlocutor);
 			if (this.conversaciones()[i].nombreInterlocutor==nombreInterlocutor)
 				return this.conversaciones()[i];
 		}
@@ -119,6 +125,21 @@ class Chat {
 		this.ponerVisible(interlocutor.nombre);
 	}
 	
+	verHistorial(inter){
+		console.log("Inter nombre es:");
+		console.log(inter.nombre)
+		var mensaje = {
+			type : "HISTO",
+			destinatario: inter.nombre,
+		};
+		this.chat.send(JSON.stringify(mensaje));
+		
+	}
+	
+	verHistorial2(env, dest){
+		//aqui tengo que obtener los mensajes de la bbdd siendo env = YO y dest la persona con las que me los he escrito
+	
+		}
 	ponerVisible(nombreInterlocutor) {
 		for (var i=0; i<this.conversaciones().length; i++) {
 			var conversacion = this.conversaciones()[i];
