@@ -25,10 +25,6 @@
 				</div>
 				<!-- /ko -->
 
-				<div class="oj-sm-12">
-					<button data-bind="click : encenderVideoLocal">Encender vídeo local</button>
-					<button data-bind="click : crearConexion">Crear conexión</button>
-				</div>
 				
 				<!-- ko with : chat -->
 					<div class="oj-sm-12 oj-flex">
@@ -41,7 +37,7 @@
 									<img data-bind="attr : { src : foto }" width="30" height="30">
 								<!-- /ko -->
 								<a data-bind="html : nombre, click : function() { $parent.setDestinatario($data); }"></a>
-								<button data-bind="click : function() { $parents[$parents.length-1].enviarOferta($data); }">Enviar oferta</button>
+								<button data-bind="click : function() { $parents[$parents.length-1].enviarOferta($data); }">Videollamada</button>
 							</div>
 							<!-- /ko -->						
 						</div>
