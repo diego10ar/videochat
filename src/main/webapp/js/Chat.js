@@ -77,8 +77,8 @@ class Chat {
 				self.ponerVisible(data.remitente);
 			} 
 			else if (data.type == "HISTO") {
-				console.log(data.enviador);
-				console.log(data.destinatario);
+				//console.log(data.enviador);
+			//	console.log(data.destinatario);
 				self.verHistorial2(data.enviador,data.destinatario);
 			}
 			
@@ -119,10 +119,10 @@ class Chat {
 		for (var i=0; i<this.conversacionesHistorial().length; i++) {
 			//console.log(this.conversaciones()[i].nombreInterlocutor);
 			if (this.conversacionesHistorial()[i].enviador==enviador && this.conversacionesHistorial()[i].remitente==solicitante ){
-				
+				return this.conversacionesHistorial()[i];
 			}
 				
-				return this.conversacionesHistorial()[i];
+				
 		}
 		console.log("retorno nulo porque no tengo nada de momenot");
 		return null;
