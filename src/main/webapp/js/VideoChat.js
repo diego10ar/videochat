@@ -114,9 +114,9 @@ class VideoChat {
 		// this.addMensaje("Implementar función rechazarLlamada", "red");
 	}
 	
-	encenderVideoLocal(receptor) {
-		var recibidor = receptor;
+	encenderVideoLocal(llamado) {
 		let self = this;
+		
 		let constraints = {
 			video : true,
 			audio : false
@@ -130,7 +130,8 @@ class VideoChat {
 				widgetVideoLocal.srcObject = stream;
 				self.videoLocalOn = true;
 				self.addMensaje("Vídeo local conectado", "green");
-				self.crearConexion(recibidor);
+				self.crearConexion(llamado);
+				self.enviarOferta(llamado);
 			}, 
 			function(error) {
 				self.addMensaje("Error al cargar vídeo local: " + error, "red");
@@ -138,6 +139,7 @@ class VideoChat {
 		);
 		
 	}
+	
 	encenderVideoLocalReceptor(remitente, sessionDescription) {
 		let self = this;
 		let constraints = {
@@ -214,6 +216,7 @@ class VideoChat {
 		this.conexion.onnegotiationneeded = function(event) {
 			self.addMensaje("Negociación finalizada: self.conexion.onnegotiationneeded", "black");
 			self.addMensaje("Listo para enviar oferta", "black");
+			
 		}
 			
 		this.conexion.ontrack = function(event) {
@@ -232,7 +235,10 @@ class VideoChat {
 		
 		
 	}
+
+	
 	crearConexion(llamado) {
+		console.log("entro aqui despues de arrancar video");
 		let self = this;
 		var llamado=llamado;
 		let servers = { 
@@ -297,13 +303,17 @@ class VideoChat {
 		this.conexion.onremovetrack = function(event) {
 			self.addMensaje("self.conexion.onremovetrack");
 		}
-		self.enviarOferta(llamado);
+		
 		
 	}	
 	
 	enviarOferta(destinatario) {
-
+		
 		let self = this;
+		if(!self.videoLocalOn){
+		 self.encenderVideoLocal(destinatario);
+		}
+		console.log("ahora envio la oferta")
 		let sdpConstraints = {};
 		this.addMensaje("Creando oferta en el servidor Stun");
 		this.conexion.createOffer(
