@@ -11,12 +11,7 @@ class ConversacionHistorial {
 		this.mensajesHis.push(mensaje);
 	}
 	
-	clearData(){
-		console.log("tam: "+this.mensajesHis().length)
-		for(var i=0; i<this.mensajesHis().length; i++){
-		 this.mensajesHis().pop();
-		}
-	}
+	
 	
 	
 }

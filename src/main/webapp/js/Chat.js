@@ -185,16 +185,19 @@ class Chat {
 			
 				var conversacionActual = self.buscarConversacionHistorial(e,d);
 				if (conversacionActual!=null) {
-					//conversacionActual.clearData();
+					
 					console.log("ya tenía "+ conversacionActual.mensajesHis().length)
 					for (var i=conversacionActual.mensajesHis().length; i<histo.length; i++) {
 						var sender=histo[i].sender;
 						if(sender==e){
 							sender="Yo"
 						}
-						var mensaje = new Mensaje(sender, histo[i].message, histo[i].date);
+						var dat = new Date(histo[i].date);
+						var de = dat.getDate()+"-"+ dat.getMonth()+1+"-"+dat.getFullYear()+", "+dat.getHours()+"-"+ dat.getMinutes()+"-"+dat.getSeconds();
+						var mensaje = new Mensaje(sender, histo[i].message, de);
 						conversacionActual.addMensaje(mensaje);
 					}
+						
 				} else {
 					conversacionActual = new ConversacionHistorial(this.ko, e, d, self);
 					for (var i=0; i<histo.length; i++) {
@@ -202,11 +205,14 @@ class Chat {
 						if(sender==e){
 							sender="Yo"
 						}
-						var mensaje = new Mensaje(sender, histo[i].message, histo[i].date);
+							var dat = new Date(histo[i].date);
+						var de = dat.getDate()+"-"+dat.getMonth()+1+"-"+dat.getFullYear()+", "+dat.getHours()+"-"+ dat.getMinutes()+"-"+dat.getSeconds();
+						var mensaje = new Mensaje(sender, histo[i].message, de);
 						//console.log(mensaje);
 						conversacionActual.addMensaje(mensaje);
 					}
 					self.conversacionesHistorial.push(conversacionActual);
+					
 				}
 				self.ponerVisibleHistorial(e,d);
 			
@@ -221,15 +227,11 @@ class Chat {
 		}
 	}
 	ponerVisibleHistorial(e,d) {
-		console.log("lo pongo visible ")
+		
 		
 		for (var i=0; i<this.conversacionesHistorial().length; i++) {
 				var conversacion = this.conversacionesHistorial()[i];
-			//console.log(this.conversaciones()[i].nombreInterlocutor);
-	
-			console.log(conversacion.enviador==e && conversacion.remitente==d);
-			console.log("tamanio de");
-			console.log(conversacion.mensajesHis.length);
+			
 			conversacion.visibleHis(conversacion.enviador==e && conversacion.remitente==d);
 		}
 		

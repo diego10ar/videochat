@@ -48,13 +48,16 @@
 							<!-- /ko -->						
 						</div>
 							<div class="oj-sm-5" >
+							
 							<!-- ko foreach : conversacionesHistorial -->
-							<!-- ko with : enviador -->
+							<div data-bind="visible : visibleHis">
+							<!-- ko with : remitente -->
+							
 							<h3>Conversaciones con <span data-bind="html : $data"></span></h3>
 							<!-- /ko -->
 							<div style="overflow: scroll; height: 250px;">
 							
-							<div data-bind="visible : visibleHis">
+							
 
 								<!-- ko foreach : mensajesHis -->
 								<div>
@@ -64,8 +67,9 @@
 									<span data-bind="html : texto"></span>
 								</div>
 								<!-- /ko -->
-							</div>
 							
+							
+						</div>
 						</div>
 						<!-- /ko -->
 						</div>
