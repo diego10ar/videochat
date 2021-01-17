@@ -33,6 +33,35 @@ public class WebSocketSignaling extends WebSocketVideoChat {
 			this.send(navegadorDelDestinatario, "type", "OFFER", "remitente", nombreRemitente, "sessionDescription", jso.get("sessionDescription"));
 			return;
 		}
+		if (type.equals("ARRANCA")) {
+		
+			System.out.println("llego arranca para llamar a "+recipient+ " de parte de "+remitente.getName());
+			JSONObject jsoMessage2 = new JSONObject();
+			jsoMessage2.put("type",  "BE_READY");
+			jsoMessage2.put("recibeLlamda", recipient);
+			jsoMessage2.put("haceLlamada", remitente.getName());
+			this.broadcast2(recipient, jsoMessage2);
+			return;
+		}
+		if (type.equals("RECHAZO")) {
+			System.out.println("OYE "+recipient+" que "+jso.getString("recibe")+" no quiere hablar contigo");
+			JSONObject jsoMessage2 = new JSONObject();
+			jsoMessage2.put("type",  "RECHAZO");
+			jsoMessage2.put("recibeLlamda", jso.getString("recibe"));
+			jsoMessage2.put("haceLlamada", recipient);
+			this.broadcast2(recipient, jsoMessage2);
+			return;
+		}
+		if (type.equals("IM_READY")) {
+			
+			
+			JSONObject jsoMessage2 = new JSONObject();
+			jsoMessage2.put("type",  "IM_READY");
+			jsoMessage2.put("haceLlamada", recipient);
+			jsoMessage2.put("recibe", remitente.getName());
+			this.broadcast2(recipient, jsoMessage2);
+			return;
+		}
 		if (type.equals("ANSWER")) {
 			VideoRoom videoRoom = this.videoRooms.get("1");
 			this.send(videoRoom.getA(), "type", "ANSWER", "sessionDescription", jso.get("sessionDescription"));

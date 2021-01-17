@@ -9,7 +9,7 @@ class VideoChat {
 		
 		this.estado = ko.observable("No conectado");
 		this.error = ko.observable();
-		
+		this.rec=ko.observable();
 		this.ws = new WebSocket("wss://" + window.location.host + "/wsSignaling");
 		
 		this.ws.onopen = function() {
@@ -33,8 +33,23 @@ class VideoChat {
 		this.ws.onmessage = function(event) {
 			var data = JSON.parse(event.data);
 			if (data.type=="OFFER") {
-				self.anunciarLlamada(data.remitente, data.sessionDescription);
+				self.establecerLlamada(data.remitente, data.sessionDescription);
 				return;
+			}
+			if (data.type=="IM_READY") {
+				console.log(data.reibe+" me dice que esta listo");
+				self.enviarOferta(data.recibe);
+				return;
+			}
+			if (data.type=="BE_READY") {
+				console.log("Me pongo las botas que me llama"+data.haceLlamada);
+				self.anunciarLlamada(data.haceLlamada, data.recibeLlamda);
+			
+			}
+				if (data.type=="RECHAZO") {
+				console.log("Me da que no quieren hablar contigo");
+				self.comunicarRechazo(data.haceLlamada, data.recibeLlamda);
+			
 			}
 			if (data.type=="CANDIDATE" && data.candidate) {
 				self.addMensaje("Recibido candidato desde Signaling", "blue");
@@ -55,21 +70,24 @@ class VideoChat {
 			}
 		}
 	}
+	comunicarRechazo(hacellamada, recibellamada){
 	
-	anunciarLlamada(remitente, sessionDescription) {
-		this.addMensaje("Se recibe llamada de " + remitente + " con su sessionDescription", "black");
+		window.alert("Lo siento "+hacellamada+ " pero "+recibellamada+" ha rechazado hablar contigo");
+	}
+	anunciarLlamada(remitente, recibeLlamada) {
+		//this.addMensaje("Se recibe llamada de " + remitente + " con su sessionDescription", "black");
 		let aceptar = window.confirm("Te llama " + remitente + ". ¿Contestar?\n");
 		if (aceptar)
-			this.aceptarLlamada(remitente, sessionDescription);
+			this.aceptarLlamada(remitente);
 		else
-			this.rechazarLlamada(remitente, sessionDescription);
+			this.rechazarLlamada(remitente,recibeLlamada);
 			
 	}
 	
-	aceptarLlamada(remitente, sessionDescription) {
-		var encendida = new Boolean(false);
+	aceptarLlamada(remitente) {
+	
 		if (!this.videoLocalOn){
-			this.encenderVideoLocalReceptor(remitente, sessionDescription);
+			this.encenderVideoLocalReceptor(remitente);
 		}		
 	}
 	
@@ -109,12 +127,18 @@ class VideoChat {
 		
 	}
 	
-	rechazarLlamada(remitente, sessionDescription) {
-		this.addMensaje("Llamada de " + remitente + " rechazada");
-		// this.addMensaje("Implementar función rechazarLlamada", "red");
+	rechazarLlamada(haceLlamada, recibe) {
+		let self = this;
+		let msg = {
+					type : "RECHAZO",
+					recipient : haceLlamada,
+					recibe: recibe,
+				};
+				self.ws.send(JSON.stringify(msg));
 	}
 	
 	encenderVideoLocal(llamado) {
+		console.log("llamo a  "+llamado)
 		let self = this;
 		
 		let constraints = {
@@ -131,7 +155,6 @@ class VideoChat {
 				self.videoLocalOn = true;
 				self.addMensaje("Vídeo local conectado", "green");
 				self.crearConexion(llamado);
-				self.enviarOferta(llamado);
 			}, 
 			function(error) {
 				self.addMensaje("Error al cargar vídeo local: " + error, "red");
@@ -140,8 +163,22 @@ class VideoChat {
 		
 	}
 	
-	encenderVideoLocalReceptor(remitente, sessionDescription) {
+	videoLLamada(llamado){
+		self.encenderVideoLocal(llamado);
+		console.log("soy el ws")
+		console.log(this.ws);
+		let msg = {
+					type : "OFFER",
+					sessionDescription : "a",
+					recipient : "A"
+				};
+	this.ws.send(JSON.stringify(msg));
+	}
+	
+	encenderVideoLocalReceptor(remitente) {
+		
 		let self = this;
+		
 		let constraints = {
 			video : true,
 			audio : false
@@ -155,7 +192,7 @@ class VideoChat {
 				widgetVideoLocal.srcObject = stream;
 				self.videoLocalOn = true;
 				self.addMensaje("Vídeo local conectado", "green");
-				self.crearConexionReceptor(remitente, sessionDescription);
+				self.crearConexionReceptor(remitente);
 			}, 
 			function(error) {
 				self.addMensaje("Error al cargar vídeo local: " + error, "red");
@@ -163,80 +200,6 @@ class VideoChat {
 		);
 		
 	}
-	
-	crearConexionReceptor(remitente, sessionDescription) {
-		let self = this;
-		let servers = { 
-			iceServers : [ 
-				// { "url" : "stun:stun.1.google.com:19302" }
-				{ 
-					urls : "turn:localhost",
-					username : "webrtc",
-					credential : "turnserver"
-				}
-			]
-		};
-		this.conexion = new RTCPeerConnection(servers);
-		this.addMensaje("RTCPeerConnection creada");
-		
-		this.addMensaje("Asociando pistas locales a la RTCPeerConnection");
-		let localTracks = this.localStream.getTracks();
-		localTracks.forEach(track =>
-			{
-				this.conexion.addTrack(track, this.localStream);
-			}
-		);
-		
-		this.conexion.onicecandidate = function(event) {
-			if (event.candidate) {
-				self.addMensaje("self.conexion.onicecandidate (<i>recibido candidate desde el Stun</i>)");
-				let msg = {
-					type : "CANDIDATE",
-					candidate : event.candidate
-				};
-				self.ws.send(JSON.stringify(msg));
-				self.addMensaje("Candidate enviado al servidor de Signaling");
-			}  else {
-				self.addMensaje("Rechazada la llamada con pepito");
-			}
-		}
-		
-		this.conexion.oniceconnectionstatechange = function(event) {
-			self.addMensaje("self.conexion.oniceconnectionstatechange: " + self.conexion.iceConnectionState, "DeepPink");
-		}
-			
-		this.conexion.onicegatheringstatechange = function(event) {
-			self.addMensaje("self.conexion.onicegatheringstatechange: " + self.conexion.iceGatheringState, "DeepPink");
-		}
-		
-		this.conexion.onsignalingstatechange = function(event) {
-			self.addMensaje("self.conexion.onsignalingstatechange: " + self.conexion.signalingState, "DeepPink");
-		}
-	
-		this.conexion.onnegotiationneeded = function(event) {
-			self.addMensaje("Negociación finalizada: self.conexion.onnegotiationneeded", "black");
-			self.addMensaje("Listo para enviar oferta", "black");
-			
-		}
-			
-		this.conexion.ontrack = function(event) {
-			self.addMensaje("Asociando pistas remotas a la RTCPeerConnection");
-			let widgetVideoRemoto = document.getElementById("widgetVideoRemoto");
-			widgetVideoRemoto.srcObject = event.streams[0];
-			self.addMensaje("Vídeo remoto conectado");
-		}
-		
-		this.conexion.onremovetrack = function(event) {
-			self.addMensaje("self.conexion.onremovetrack");
-		}
-		
-		self.establecerLlamada(remitente, sessionDescription);
-			
-		
-		
-	}
-
-	
 	crearConexion(llamado) {
 		console.log("entro aqui despues de arrancar video");
 		let self = this;
@@ -291,6 +254,12 @@ class VideoChat {
 		this.conexion.onnegotiationneeded = function(event) {
 			self.addMensaje("Negociación finalizada: self.conexion.onnegotiationneeded", "black");
 			self.addMensaje("Listo para enviar oferta", "black");
+				let msg = {
+					type : "ARRANCA",
+					recipient : llamado
+				};
+				self.ws.send(JSON.stringify(msg));
+			
 		}
 			
 		this.conexion.ontrack = function(event) {
@@ -306,6 +275,88 @@ class VideoChat {
 		
 		
 	}	
+			
+		
+		
+	
+
+	
+	crearConexionReceptor(remitente) {
+		
+		let self = this;
+		var llama=llama;
+		let servers = { 
+			iceServers : [ 
+				// { "url" : "stun:stun.1.google.com:19302" }
+				{ 
+					urls : "turn:localhost",
+					username : "webrtc",
+					credential : "turnserver"
+				}
+			]
+		};
+		this.conexion = new RTCPeerConnection(servers);
+		this.addMensaje("RTCPeerConnection creada");
+		
+		this.addMensaje("Asociando pistas locales a la RTCPeerConnection");
+		let localTracks = this.localStream.getTracks();
+		localTracks.forEach(track =>
+			{
+				this.conexion.addTrack(track, this.localStream);
+			}
+		);
+		
+		this.conexion.onicecandidate = function(event) {
+			if (event.candidate) {
+				self.addMensaje("self.conexion.onicecandidate (<i>recibido candidate desde el Stun</i>)");
+				let msg = {
+					type : "CANDIDATE",
+					candidate : event.candidate
+				};
+				self.ws.send(JSON.stringify(msg));
+				self.addMensaje("Candidate enviado al servidor de Signaling");
+			}  else {
+				self.addMensaje("Rechazada la llamada con pepito");
+			}
+		}
+		
+		this.conexion.oniceconnectionstatechange = function(event) {
+			self.addMensaje("self.conexion.oniceconnectionstatechange: " + self.conexion.iceConnectionState, "DeepPink");
+		}
+			
+		this.conexion.onicegatheringstatechange = function(event) {
+			self.addMensaje("self.conexion.onicegatheringstatechange: " + self.conexion.iceGatheringState, "DeepPink");
+		}
+		
+		this.conexion.onsignalingstatechange = function(event) {
+			self.addMensaje("self.conexion.onsignalingstatechange: " + self.conexion.signalingState, "DeepPink");
+		}
+	
+		this.conexion.onnegotiationneeded = function(event) {
+			self.addMensaje("Negociación finalizada: self.conexion.onnegotiationneeded", "black");
+			self.addMensaje("Listo para enviar oferta", "black");
+				let msg = {
+					type : "IM_READY",
+					recipient : remitente
+				};
+				self.ws.send(JSON.stringify(msg));
+			
+		}
+			
+		this.conexion.ontrack = function(event) {
+			self.addMensaje("Asociando pistas remotas a la RTCPeerConnection");
+			let widgetVideoRemoto = document.getElementById("widgetVideoRemoto");
+			widgetVideoRemoto.srcObject = event.streams[0];
+			self.addMensaje("Vídeo remoto conectado");
+		}
+		
+		this.conexion.onremovetrack = function(event) {
+			self.addMensaje("self.conexion.onremovetrack");
+		}
+		
+		
+	}	
+	
 	
 	enviarOferta(destinatario) {
 		
