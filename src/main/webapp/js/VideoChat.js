@@ -43,6 +43,7 @@ class VideoChat {
 			}
 			if (data.type=="BE_READY") {
 				console.log("Me pongo las botas que me llama"+data.haceLlamada);
+				
 				self.anunciarLlamada(data.haceLlamada, data.recibeLlamda);
 			
 			}
@@ -75,6 +76,7 @@ class VideoChat {
 		window.alert("Lo siento "+hacellamada+ " pero "+recibellamada+" ha rechazado hablar contigo");
 	}
 	anunciarLlamada(remitente, recibeLlamada) {
+		window.focus();
 		//this.addMensaje("Se recibe llamada de " + remitente + " con su sessionDescription", "black");
 		let aceptar = window.confirm("Te llama " + remitente + ". ¿Contestar?\n");
 		if (aceptar)
@@ -259,6 +261,7 @@ class VideoChat {
 					recipient : llamado
 				};
 				self.ws.send(JSON.stringify(msg));
+				
 			
 		}
 			

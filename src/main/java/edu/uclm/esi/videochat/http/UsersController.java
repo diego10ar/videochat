@@ -1,14 +1,22 @@
 package edu.uclm.esi.videochat.http;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -21,7 +29,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import edu.uclm.esi.videochat.model.Email;
 import edu.uclm.esi.videochat.model.Manager;
 import edu.uclm.esi.videochat.model.Message;
@@ -33,6 +44,8 @@ import edu.uclm.esi.videochat.springdao.UserRepository;
 
 
 @RestController
+@CrossOrigin(origins = "*", methods= {RequestMethod.GET,RequestMethod.POST})
+
 @RequestMapping("users")
 public class UsersController {
 	
@@ -50,13 +63,39 @@ public class UsersController {
 		String pwd = jso.getString("pwd");
 		String ip = request.getRemoteAddr();
 		User user = userRepo.findByNameAndPwd(name, pwd);
-		if (user==null)
-			throw new Exception("Incorrect login");
+		if (user==null) {
+		 user=new User();
+		 System.out.println("El user es "+user.toString());
+		 return user;
+		}
+		else {
 		Manager.get().add(user);
 		request.getSession().setAttribute("user", user);
 		Manager.get().add(request.getSession());
 		return user;
+		}
 	}
+	
+	@PostMapping(value = "/obtainMail")
+	public User obtainMail(HttpServletRequest request, @RequestBody Map<String, Object> credenciales) throws Exception {
+		JSONObject jso = new JSONObject(credenciales);
+		String name = jso.getString("name");
+		
+		Optional<User> user = userRepo.findByName(name);
+		if (user==null) {
+			throw new Exception("Incorrect login");
+		}
+		User u=new User();
+		
+		if(user.isPresent()) {
+			u=user.get();
+			Email e=new Email();
+			String mens="Hola "+u.getName()+" has solicitado una recuperación de contraseña, su contraseña era: "+u.getPwd();
+			e.send(u.getEmail(), "Recuperación de contraseña Videochat", mens);
+		}
+		return u;
+	}
+	
 	@PostMapping("/conversaciones")
 	public List<Message> conversaciones (HttpServletRequest request, @RequestBody Map<String, Object> datosConver) throws Exception {
 		JSONObject jso = new JSONObject(datosConver);
@@ -79,6 +118,7 @@ public class UsersController {
 		if (!pwd1.equals(pwd2))
 			throw new Exception("Error: las contraseñas no coinciden");
 		User user = new User();
+		System.out.println("voy a guardar un user con id:"+user.getId()+ " con tamaño de: "+user.getId().length());
 		user.setEmail(email);
 		user.setName(name);
 		user.setPwd(pwd1);
@@ -96,6 +136,8 @@ public class UsersController {
 			" o aquí: " +
 			"https://localhost:7500/users/confirmarCuenta2/" + token.getId());
 	}
+	
+	
 	
 	@GetMapping("/confirmarCuenta2/{tokenId}")
 	public void confirmarCuenta2(HttpServletRequest request, HttpServletResponse response, @PathVariable String tokenId) throws IOException {

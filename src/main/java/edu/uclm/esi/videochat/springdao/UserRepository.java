@@ -13,8 +13,12 @@ public interface UserRepository extends CrudRepository <User, String> {
 	
 	@Query(value = "SELECT count(*) FROM user where name=:name and pwd=:pwd", nativeQuery = true)
 	public int checkPassword(@Param("name") String name,@Param("pwd") String pwd);
-
+    
+	
+	
 	
 	public User findByNameAndPwd(String name, String pwd);
+	
+	
 	public Optional<User> findByName(String name);
 }

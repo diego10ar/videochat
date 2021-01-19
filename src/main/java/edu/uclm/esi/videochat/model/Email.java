@@ -14,13 +14,13 @@ public class Email {
 	private final Properties properties = new Properties();
 
 	public void send(String destinatario, String subject, String body) {
-		String smtpHost= "smtp.office365.com";
+		String smtpHost= "smtp.gmail.com";
 		String startTTLS="true";
 		String port="587";
-		String sender="macario.polo@uclm.es";		// REMITENTE
-		String serverUser="macario.polo@uclm.es";	// USUARIO
+		String sender="tecnoServerDiegos@gmail.com";		// REMITENTE
+		String serverUser="tecnoServerDiegos@gmail.com";	// USUARIO
 		String userAutentication= "true";
-		String pwd="********";				// PONER LA CONTRASEÑA
+		String pwd="TECdiegos27";				// PONER LA CONTRASEÑA
 		String fallback="true";	
 		
 		properties.put("mail.smtp.host", smtpHost);  
@@ -68,9 +68,5 @@ public class Email {
         }
     }
 	
-	public static void main(String[] args) throws Exception {
-		Email sender=new Email();
-		sender.send("macario.polo@uclm.es", "Hola", "Caracola");
-		System.out.println("Enviado");
-	}
+
 }

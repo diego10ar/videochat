@@ -6,19 +6,61 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 		self.userName = ko.observable("");
 		self.pwd = ko.observable("");
 		self.message = ko.observable("");
-		
+		self.us=ko.observable("");
 		app.userName = self.userName();
 		
 		self.goToRegister = function() {
 			app.router.go( { path : 'register' } );
 		}
-		
+		self.recordarPass = function() {
+			var nombre=self.userName();
+			console.log("comruebo");
+			if(nombre==""){
+				window.alert("Introduce tu nombre de usuario y te devolveremos tu contraseña al correo con el que te registraste ");
+			}
+			else{
+			   var info = {
+				name : self.userName(),
+			};
+			var data = {
+				data : JSON.stringify(info),
+				url : "users/obtainMail",
+				type : "post",
+				contentType : 'application/json',
+				success : function(response) {
+					self.us=response;
+					console.log(self.us);
+					if(self.us.email!=null){
+						window.alert("Se te ha enviado la contraseña al correo "+self.us.email);
+					}
+					else{
+						window.alert("El usuario "+nombre+" no se encuentra en la base de datos");
+					}
+					
+					
+					
+					
+				},
+				error : function(response) {
+					console.log("Error: " + response.responseJSON.error);
+				}
+			};
+			$.ajax(data);
+			}
+			
+		}
 		self.goToDevicesManager = function() {
 			app.router.go( { path : 'devicesManager' } );
 		}
 
 		self.login = function() {
-			self.message("Has pulsado login con estas credenciales: " + self.userName() + "/" + self.pwd());
+			
+			var name=self.userName();
+			var pwd=self.pwd();
+			if (name == ""|| pwd == "" ) {
+					window.alert("Por favor rellene todos los campos");
+				}
+				else{
 			var info = {
 				name : self.userName(),
 				pwd : self.pwd()
@@ -29,14 +71,23 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				type : "post",
 				contentType : 'application/json',
 				success : function(response) {
-					app.user = ko.observable(response);
+					
+					console.log(response.name);
+					if(response.name==null){
+						var mensaje=new String("Compruebe nombre de usuario y contraseña");
+						self.message(mensaje.fontcolor("red"));
+					}
+					else{
+						app.user = ko.observable(response);
 					app.router.go( { path : 'chat' } );
+					}
 				},
 				error : function(response) {
 					console.log("Error: " + response.responseJSON.error);
 				}
 			};
 			$.ajax(data);
+			}
 		}
 
 		// Header Config
