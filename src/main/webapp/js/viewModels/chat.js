@@ -8,11 +8,11 @@ define(
 				this.user = app.user;
 
 				self.recipient = ko.observable();
-
+		
 				self.chat = ko.observable(new Chat(ko));
 
 				self.videoChat = ko.observable(new VideoChat(ko));
-
+	
 				self.estadoChatDeTexto = self.chat().estado;
 				self.estadoSignaling = self.videoChat().estado;
 				self.errorChatDeTexto = self.chat().error;
@@ -71,10 +71,20 @@ define(
 				// self.crearConexion = function() {
 				// self.videoChat().crearConexion();
 				// }
+				
 				self.enviarOferta = function(destinatario) {
 					
 					
 					self.videoChat().encenderVideoLocal(destinatario.nombre);
+					
+					
+
+				}
+					self.llamadaGrupo = function(grupo) {
+					console.log(grupo);+
+					self.videoChat().setGrupo(grupo);
+					self.videoChat().encenderVideoLocalGrupo(grupo);
+					//self.videoChat().encenderVideoLocal(destinatario.nombre);
 					
 					
 

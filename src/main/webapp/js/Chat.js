@@ -7,6 +7,7 @@ class Chat {
 		this.error = ko.observable();
 		//this.enviador=ko.observable();
 		this.usuarios = ko.observableArray([]);
+		this.grupoPersonas = ko.observableArray([]);
 		this.mensajesRecibidos = ko.observableArray([]);
 		this.conversaciones = ko.observableArray([]);
 		this.histo=ko.observableArray([]);
@@ -139,6 +140,21 @@ class Chat {
 			this.conversaciones.push(conversacion);
 		}
 		this.ponerVisible(interlocutor.nombre);
+	}
+	
+	ponerEnGrupo(inter){
+		var persona=new PersonaGrupo(this.ko, inter.nombre);
+		var esta=0;
+		for(var i=0; i<this.grupoPersonas().length; i++){
+			if(this.grupoPersonas()[i].nombre==persona.nombre){
+				esta=1;
+			}
+		}
+		if(esta==0){
+			this.grupoPersonas.push(persona);
+			}
+			
+		
 	}
 	
 	verHistorial(inter){

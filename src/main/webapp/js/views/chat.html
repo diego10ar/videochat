@@ -41,7 +41,7 @@
 									
 								<a data-bind="html : nombre, click : function() { $parent.setDestinatario($data); }"></a>
 								<button data-bind="click : function() { $parents[$parents.length-1].enviarOferta($data); }">Videollamada</button>
-					
+								<button data-bind="click : function() { $parent.ponerEnGrupo($data);  }">A�adir Grupo</button>
 								<button data-bind="click : function() { $parent.verHistorial($data);  }">Ver Historial</button>
 								
 							</div>
@@ -116,17 +116,21 @@
 							<!-- /ko -->
 						</div>
 						<div class="oj-sm-4">
-							<h4>Mensajes de conexión</h4>
-							<!-- ko with : $parents[$parents.length-1].videoChat -->
-								<!-- ko foreach : mensajes -->
-								<div data-bind="html : texto, style : { color :  color }"></div>
-								<!-- /ko -->
+							<h4>Grupo Personas</h4>
+							<!-- ko foreach : grupoPersonas -->
+								
+								<div data-bind="html : nombre"></div>
+								
 							<!-- /ko -->
+							<!-- ko with : grupoPersonas -->
+							<button data-bind="click : function() { $parents[$parents.length-1].llamadaGrupo($data); }">Comenzar Llamada de Grupo</button>
+								<!-- /ko -->
 						</div>
 						<div class="oj-sm-4">
 							<h4>Zona de vídeo</h4>
 							<video id="widgetVideoLocal" playsinline autoplay controls mute width="200" height="200"></video>
 							<video id="widgetVideoRemoto" playsinline autoplay controls width="200" height="200"></video>	
+							<video id="widgetVideoRemoto2" playsinline autoplay controls width="200" height="200"></video>	
 						</div>
 					</div>
 				<!-- /ko -->
