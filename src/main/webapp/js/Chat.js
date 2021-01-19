@@ -243,6 +243,8 @@ class Chat {
 	addUsuario(userName, picture) {
 		this.usuarios.push(new Usuario(userName, picture));
 	}
+	
+
 
 }
 	

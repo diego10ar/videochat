@@ -25,9 +25,4 @@ public interface UserRepository extends CrudRepository <User, String> {
 	
 	public Optional<User> findByName(String name);
 
-
-
-
-	@Query(value = "SELECT id, email, name, pwd, confirmation_date from user", nativeQuery = true)
-	public Enumeration<User> todosSinFoto();
 }

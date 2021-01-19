@@ -177,4 +177,6 @@ public class UsersController {
 	public List<User> getUsuariosConectados() {
 		return Manager.get().getUsuariosConectados();
 	}
+	
+	
 }

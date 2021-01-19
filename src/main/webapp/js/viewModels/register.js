@@ -49,7 +49,7 @@ define(['knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils'],
 							app.router.go({ path: "login" }); // Me lleva a login
 						},
 						error: function(response) {
-							alert("Error: " + response.responseJSON.error);
+							alert("Parece que este nombre de usuario ya esta registrado");
 						}
 					};
 					$.ajax(data);

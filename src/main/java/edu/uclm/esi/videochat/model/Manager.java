@@ -59,7 +59,6 @@ public class Manager {
 		while (eUsers.hasMoreElements()) {
 			User user = eUsers.nextElement();
 			user.setPwd(null);
-			user.setPicture(null);
 			users.add(user);
 	
 		}
@@ -67,10 +66,17 @@ public class Manager {
 		return users;
 	}
 	public User getSoloFoto(String nombre) {
-		Vector<User> users = new Vector<>();
-		User u = this.usersMap.get(nombre);
-
-		return u;
+		
+		Enumeration<User> eUsers = this.usersMap.elements();
+		User user=new User(); 
+		while (eUsers.hasMoreElements()) {
+			 user = eUsers.nextElement();
+			if(user.getName().equals(nombre)) {
+				return user;
+			}
+	
+		}
+		return user;
 	}
 	public HttpSession getSession(String sessionId) {
 		return this.sessions.get(sessionId);

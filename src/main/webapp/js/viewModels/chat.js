@@ -50,8 +50,7 @@ define(
 							for (var i = 0; i < response.length; i++) {
 							
 								var userName = response[i].name;
-								self.obtenerFoto(userName);
-						
+								var picture=response[i].picture;
 									self.chat().addUsuario(userName,picture);
 								
 								
@@ -72,7 +71,6 @@ define(
 				// self.crearConexion = function() {
 				// self.videoChat().crearConexion();
 				// }
-
 				self.enviarOferta = function(destinatario) {
 					
 					

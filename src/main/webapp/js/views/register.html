@@ -14,9 +14,9 @@
             <input type="email" placeholder="Correo electrónico" data-bind="value : email">
             <input type="password" placeholder="Contraseña" data-bind="value : pwd1">
             <input type="password" placeholder="Repite contraseña" data-bind="value : pwd2">
-            <input type ="file" size="50" data-bind="event : {change : setPicture }"></br>
-             
-            <img  data-bind="attr: { src : picture}">
+            <input type ="file" data-bind="event : {change : setPicture }"  ></br>
+             </br>
+            <img  data-bind="attr: { src : picture}" width="500"></br>
 			
             <button id="btnCrearCuenta" data-bind="click : register">Crear cuenta!</button>
         </div>

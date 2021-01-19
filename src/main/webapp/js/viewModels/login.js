@@ -3,8 +3,8 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 
 	function LoginViewModel() {
 		var self = this;
-		self.userName = ko.observable("afa");
-		self.pwd = ko.observable("afa");
+		self.userName = ko.observable("");
+		self.pwd = ko.observable("");
 		self.message = ko.observable("");
 		self.us=ko.observable("");
 		app.userName = self.userName();
@@ -72,7 +72,7 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 				contentType : 'application/json',
 				success : function(response) {
 					
-					console.log(response.name);
+			
 					if(response.name==null){
 						var mensaje=new String("Compruebe nombre de usuario y contraseña");
 						self.message(mensaje.fontcolor("red"));
