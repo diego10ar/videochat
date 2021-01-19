@@ -59,14 +59,19 @@ public class Manager {
 		while (eUsers.hasMoreElements()) {
 			User user = eUsers.nextElement();
 			user.setPwd(null);
+			user.setPicture(null);
 			users.add(user);
-			
-			
+	
 		}
 		
 		return users;
 	}
+	public User getSoloFoto(String nombre) {
+		Vector<User> users = new Vector<>();
+		User u = this.usersMap.get(nombre);
 
+		return u;
+	}
 	public HttpSession getSession(String sessionId) {
 		return this.sessions.get(sessionId);
 	}

@@ -3,8 +3,8 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 
 	function LoginViewModel() {
 		var self = this;
-		self.userName = ko.observable("");
-		self.pwd = ko.observable("");
+		self.userName = ko.observable("afa");
+		self.pwd = ko.observable("afa");
 		self.message = ko.observable("");
 		self.us=ko.observable("");
 		app.userName = self.userName();
@@ -78,7 +78,7 @@ define([ 'knockout', 'appController', 'ojs/ojmodule-element-utils', 'accUtils',
 						self.message(mensaje.fontcolor("red"));
 					}
 					else{
-						app.user = ko.observable(response);
+				app.user = ko.observable(response);
 					app.router.go( { path : 'chat' } );
 					}
 				},

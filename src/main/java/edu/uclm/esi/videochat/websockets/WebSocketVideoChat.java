@@ -37,9 +37,9 @@ public abstract class WebSocketVideoChat extends TextWebSocketHandler {
 		JSONObject mensaje = new JSONObject();
 		mensaje.put("type", "ARRIVAL");
 		mensaje.put("userName", user.getName());
-		mensaje.put("picture", user.getPicture());
+	//	mensaje.put("picture", user.getPicture());
 		
-		this.broadcast(mensaje);
+		this.broadcastMe(mensaje, user.getName());
 		
 		WrapperSession wrapper = new WrapperSession(session, user);
 		this.sessionsByUserName.put(user.getName(), wrapper);
@@ -70,9 +70,30 @@ public abstract class WebSocketVideoChat extends TextWebSocketHandler {
 				Collection<WrapperSession> wrappers = WebSocketVideoChat.this.sessionsById.values();
 				for (WrapperSession wrapper : wrappers) {
 					try {
+						
 						wrapper.getSession().sendMessage(message);
 					} catch (IOException e) {
 						System.err.println("//TODO : ");
+					}
+				}
+			}
+		};
+		new Thread(r).start();
+	}
+	protected void broadcastMe(JSONObject jsoMessage, String userMe) {
+		TextMessage message = new TextMessage(jsoMessage.toString());
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				Collection<WrapperSession> wrappers = WebSocketVideoChat.this.sessionsById.values();
+				for (WrapperSession wrapper : wrappers) {
+					if(!wrapper.getUser().getName().equals(userMe)) {
+					try {
+						
+						wrapper.getSession().sendMessage(message);
+					} catch (IOException e) {
+						System.err.println("//TODO : ");
+					}
 					}
 				}
 			}

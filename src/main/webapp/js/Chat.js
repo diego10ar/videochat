@@ -42,8 +42,11 @@ class Chat {
 				var mensaje = new Mensaje(data.nombreEnviador, data.message, data.time);
 				self.mensajesRecibidos.push(mensaje);
 			} else if (data.type == "ARRIVAL") {
+				
 				var usuario = new Usuario(data.userName, data.picture);
-				self.usuarios.push(usuario);
+					self.usuarios.push(usuario);
+				
+			
 				
 			} else if (data.type == "BYE") {
 				var userName = data.userName;
@@ -240,5 +243,6 @@ class Chat {
 	addUsuario(userName, picture) {
 		this.usuarios.push(new Usuario(userName, picture));
 	}
+
 }
 	

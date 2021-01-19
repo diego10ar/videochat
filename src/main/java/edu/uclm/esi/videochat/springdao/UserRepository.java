@@ -1,11 +1,14 @@
 package edu.uclm.esi.videochat.springdao;
 
+import java.util.Enumeration;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
+import edu.uclm.esi.videochat.model.Message;
 import edu.uclm.esi.videochat.model.User;
 
 public interface UserRepository extends CrudRepository <User, String> {
@@ -21,4 +24,10 @@ public interface UserRepository extends CrudRepository <User, String> {
 	
 	
 	public Optional<User> findByName(String name);
+
+
+
+
+	@Query(value = "SELECT id, email, name, pwd, confirmation_date from user", nativeQuery = true)
+	public Enumeration<User> todosSinFoto();
 }

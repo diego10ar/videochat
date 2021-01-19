@@ -40,16 +40,22 @@ define(
 				};
 
 				function getUsuariosConectados() {
+					
 					var data = {
 						url : "users/getUsuariosConectados",
 						type : "get",
-						contentType : 'application/json',
+						contepntType : 'application/json',
 						success : function(response) {
-							for (var i = 1; i < response.length; i++) {
+							
+							for (var i = 0; i < response.length; i++) {
+							
 								var userName = response[i].name;
-								var picture = response[i].picture;
-								self.chat().addUsuario(userName, picture);
-
+								self.obtenerFoto(userName);
+						
+									self.chat().addUsuario(userName,picture);
+								
+								
+							
 							}
 						},
 						error : function(response) {
