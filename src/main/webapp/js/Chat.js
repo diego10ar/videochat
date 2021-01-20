@@ -144,7 +144,9 @@ class Chat {
 	
 	ponerEnGrupo(inter){
 		var persona=new PersonaGrupo(this.ko, inter.nombre);
+			console.log(this.chat);
 		var esta=0;
+		
 		for(var i=0; i<this.grupoPersonas().length; i++){
 			if(this.grupoPersonas()[i].nombre==persona.nombre){
 				esta=1;

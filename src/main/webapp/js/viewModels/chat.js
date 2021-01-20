@@ -80,10 +80,13 @@ define(
 					
 
 				}
-					self.llamadaGrupo = function(grupo) {
-					console.log(grupo);+
-					self.videoChat().setGrupo(grupo);
-					self.videoChat().encenderVideoLocalGrupo(grupo);
+				self.llamadaGrupo = function(grupo) {
+					console.log(this.user().name);
+					console.log(grupo);
+					
+					grupo.push()
+					self.videoChat().setGrupo(grupo, this.user().name);
+					self.videoChat().encenderVideoLocalGrupo();
 					//self.videoChat().encenderVideoLocal(destinatario.nombre);
 					
 					

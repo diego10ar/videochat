@@ -6,7 +6,7 @@ class VideoChat {
 		this.videoLocalOn = false;
 		
 		this.mensajes = ko.observableArray([]);
-		var listos=0;
+		var listos=1;
 		this.estado = ko.observable("No conectado");
 		this.error = ko.observable();
 		this.rec=ko.observable();
@@ -41,9 +41,10 @@ class VideoChat {
 				return;
 			}
 			if (data.type=="OFFER_GRUPO1") {
-				self.establecerLlamadaGrupo1(data.remitente, data.sessionDescription);
+				self.establecerLlamadaGrupo2(data.remitente, data.sessionDescription);
 				return;
 			}
+		
 			if (data.type=="IM_READY") {
 				console.log(data.recibe+" me dice que esta listo");
 				self.enviarOferta(data.recibe);
@@ -52,15 +53,19 @@ class VideoChat {
 			if (data.type=="IM_READY_GRUPO") {
 				listos++;
 				console.log(data.recibe+" me dice que esta listo");
+				if(listos==2){
+					self.crearConexionGrupo2();
+				}
 				if(listos==self.grupo().length){
 					self.enviarOfertaGrupo();
+					self.enviarOfertaGrupo2();
 				}
 				return;
 			}
 			if (data.type=="BE_READY") {
 				console.log("Me pongo las botas que me llama"+data.haceLlamada);
 				
-				self.anunciarLlamada(data.haceLlamada, data.recibeLlamda);
+				self.anunciarLlamadaGrupo(data.haceLlamada, data.recibeLlamda);
 			
 			}
 			if (data.type=="BE_READY_GRUPO") {
@@ -83,24 +88,7 @@ class VideoChat {
 				}
 				return;
 			}
-				if (data.type=="CANDIDATE_GRUPO" && data.candidate) {
-				//self.addMensaje("Recibido candidato desde Signaling", "blue");
-				try {
-					self.conexion.addIceCandidate(data.candidate);
-				} catch (error) {
-					//self.addMensaje(error, "red");
-				}
-				return;
-			}
-				if (data.type=="CANDIDATE_GRUPO1" && data.candidate) {
-				//self.addMensaje("Recibido candidato desde Signaling", "blue");
-				try {
-					self.conexion2.addIceCandidate(data.candidate);
-				} catch (error) {
-					//self.addMensaje(error, "red");
-				}
-				return;
-			}
+	
 			if (data.type=="ANSWER") {
 				let sessionDescription = data.sessionDescription;
 				let rtcSessionDescription = new RTCSessionDescription(sessionDescription);
@@ -109,22 +97,7 @@ class VideoChat {
 				//self.addMensaje("sessionDescription añadida a la remoteDescription", "orange");
 				return;
 			}
-			if (data.type=="ANSWER_GRUPO") {
-				let sessionDescription = data.sessionDescription;
-				let rtcSessionDescription = new RTCSessionDescription(sessionDescription);
-				//self.addMensaje("Añadiendo sessionDescription a la remoteDescription", "orange");
-				self.conexion.setRemoteDescription(rtcSessionDescription);
-				//self.addMensaje("sessionDescription añadida a la remoteDescription", "orange");
-				return;
-			}
-				if (data.type=="ANSWER_GRUPO1") {
-				let sessionDescription = data.sessionDescription;
-				let rtcSessionDescription = new RTCSessionDescription(sessionDescription);
-				//self.addMensaje("Añadiendo sessionDescription a la remoteDescription", "orange");
-				self.conexion2.setRemoteDescription(rtcSessionDescription);
-				//self.addMensaje("sessionDescription añadida a la remoteDescription", "orange");
-				return;
-			}
+		
 		}
 	}
 	
@@ -154,6 +127,16 @@ class VideoChat {
 			this.rechazarLlamada(remitente,recibeLlamada);
 			
 	}
+			anunciarLlamadaGrupo2(remitente, recibeLlamada) {
+	
+		////this.addMensaje("Se recibe llamada de " + remitente + " con su sessionDescription", "black");
+		let aceptar = window.confirm("Te llama " + remitente + ". ¿Contestar?\n");
+		if (aceptar)
+			this.aceptarLlamadaGrupo2(remitente);
+		else
+			this.rechazarLlamada(remitente,recibeLlamada);
+			
+	}
 	
 	aceptarLlamada(remitente) {
 	
@@ -162,6 +145,12 @@ class VideoChat {
 		}		
 	}
 	aceptarLlamadaGrupo(remitente) {
+	
+		if (!this.videoLocalOn){
+			this.encenderVideoLocalReceptorGrupo(remitente);
+		}		
+	}
+	aceptarLlamadaGrupo2(remitente) {
 	
 		if (!this.videoLocalOn){
 			this.encenderVideoLocalReceptorGrupo(remitente);
@@ -237,7 +226,7 @@ class VideoChat {
 		);
 		
 	}
-	establecerLlamadaGrupo1(remitente,  sessionDescription){
+	establecerLlamadaGrupo2(remitente,  sessionDescription){
 		
 		let rtcSessionDescription = new RTCSessionDescription(sessionDescription);
 		////this.addMensaje("Añadiendo sessionDescription a la remoteDescription", "grey");
@@ -308,7 +297,7 @@ class VideoChat {
 		
 	}
 	
-		encenderVideoLocalGrupo(grupo) {
+		encenderVideoLocalGrupo() {
 		
 		let self = this;
 		
@@ -325,7 +314,7 @@ class VideoChat {
 				widgetVideoLocal.srcObject = stream;
 				self.videoLocalOn = true;
 				//self.addMensaje("Vídeo local conectado", "green");
-				self.crearConexionGrupo(grupo);
+				self.crearConexionGrupo();
 			}, 
 			function(error) {
 				//self.addMensaje("Error al cargar vídeo local: " + error, "red");
@@ -389,6 +378,31 @@ class VideoChat {
 				self.videoLocalOn = true;
 				//self.addMensaje("Vídeo local conectado", "green");
 				self.crearConexionReceptorGrupo(remitente);
+			}, 
+			function(error) {
+				//self.addMensaje("Error al cargar vídeo local: " + error, "red");
+			}
+		);
+		
+	}
+			encenderVideoLocalReceptorGrupo2(remitente) {
+		
+		let self = this;
+		
+		let constraints = {
+			video : true,
+			audio : false
+		};
+		navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+		navigator.getUserMedia(
+			constraints, 
+			function(stream) {
+				let widgetVideoLocal = document.getElementById("widgetVideoLocal");
+				self.localStream = stream;
+				widgetVideoLocal.srcObject = stream;
+				self.videoLocalOn = true;
+				//self.addMensaje("Vídeo local conectado", "green");
+				self.crearConexionReceptorGrupo2(remitente);
 			}, 
 			function(error) {
 				//self.addMensaje("Error al cargar vídeo local: " + error, "red");
@@ -472,7 +486,7 @@ class VideoChat {
 		
 		
 	}	
-		crearConexionGrupo(grupo) {
+		crearConexionGrupo() {
 		console.log("entro aqui despues de arrancar video");
 		let self = this;
 		var grupo=grupo;
@@ -528,7 +542,7 @@ class VideoChat {
 			//self.addMensaje("Negociación finalizada: self.conexion.onnegotiationneeded", "black");
 			//self.addMensaje("Listo para enviar oferta", "black");
 			
-				var llamado=grupo[0].nombre;
+				var llamado=self.grupo()[1].nombre;
 				console.log("aviso a "+llamado);
 				let msg = {
 					type : "ARRANCA_GRUPO",
@@ -549,8 +563,22 @@ class VideoChat {
 			//self.addMensaje("self.conexion.onremovetrack");
 		}
 		
-		//conexion 2
-			this.conexion2 = new RTCPeerConnection(servers);
+		}
+crearConexionGrupo2() {
+		console.log("entro aqui despues de arrancar video");
+		let self = this;
+		var grupo=grupo;
+		let servers = { 
+			iceServers : [ 
+				// { "url" : "stun:stun.1.google.com:19302" }
+				{ 
+					urls : "turn:localhost",
+					username : "webrtc",
+					credential : "turnserver"
+				}
+			]
+		};
+		this.conexion2 = new RTCPeerConnection(servers);
 		//this.addMensaje("RTCPeerConnection creada");
 		
 		//this.addMensaje("Asociando pistas locales a la RTCPeerConnection");
@@ -590,7 +618,7 @@ class VideoChat {
 			//self.addMensaje("Negociación finalizada: self.conexion.onnegotiationneeded", "black");
 			//self.addMensaje("Listo para enviar oferta", "black");
 			
-				var llamado2=grupo[1].nombre;
+				var llamado2=self.grupo()[2].nombre;
 				
 				let msg = {
 					type : "ARRANCA_GRUPO1",
@@ -610,16 +638,16 @@ class VideoChat {
 		this.conexion2.onremovetrack = function(event) {
 			//self.addMensaje("self.conexion.onremovetrack");
 		}
-	}	
-		
-		
 	
+		
+		
+	}
 
 	
 	crearConexionReceptor(remitente) {
 		
 		let self = this;
-		var llama=llama;
+		
 		let servers = { 
 			iceServers : [ 
 				// { "url" : "stun:stun.1.google.com:19302" }
@@ -695,7 +723,7 @@ class VideoChat {
 	crearConexionReceptorGrupo(remitente) {
 		
 		let self = this;
-		var llama=llama;
+		
 		let servers = { 
 			iceServers : [ 
 				// { "url" : "stun:stun.1.google.com:19302" }
@@ -765,7 +793,22 @@ class VideoChat {
 		this.conexion.onremovetrack = function(event) {
 			//self.addMensaje("self.conexion.onremovetrack");
 		}
+	}
 		
+	crearConexionReceptorGrupo2(remitente) {
+		
+		let self = this;
+		
+		let servers = { 
+			iceServers : [ 
+				// { "url" : "stun:stun.1.google.com:19302" }
+				{ 
+					urls : "turn:localhost",
+					username : "webrtc",
+					credential : "turnserver"
+				}
+			]
+		};	
 		//Conexion 2
 		this.conexion2 = new RTCPeerConnection(servers);
 		//this.addMensaje("RTCPeerConnection creada");
@@ -830,6 +873,7 @@ class VideoChat {
 		
 	}	
 	
+	
 	enviarOferta(destinatario) {
 		
 		let self = this;
@@ -875,28 +919,6 @@ class VideoChat {
 				let msg = {
 					type : "OFFER_GRUPO",
 					sessionDescription : sessionDescription,
-					recipient : self.grupo()[0].nombre,
-					
-					
-				};
-				self.ws.send(JSON.stringify(msg));
-				//self.addMensaje("Oferta enviada al servidor de signaling");
-			},
-			function(error) {
-				//self.addMensaje("Error al crear oferta en el servidor Stun", true);
-			},
-			sdpConstraints
-		);
-		
-			this.conexion2.createOffer(
-			function(sessionDescription) {
-				//self.addMensaje("sessionDescription recibida del servidor Stun");
-				self.conexion2.setLocalDescription(sessionDescription);
-				//self.addMensaje("sessionDescription enlazada a la RTCPeerConnnection local");
-				//self.addMensaje("Enviando oferta a " + self.destinatario + " mediante el servidor de Signaling");
-				let msg = {
-					type : "OFFER_GRUPO1",
-					sessionDescription : sessionDescription,
 					recipient : self.grupo()[1].nombre,
 					
 					
@@ -909,7 +931,35 @@ class VideoChat {
 			},
 			sdpConstraints
 		);
+		}
+		enviarOfertaGrupo2() {
+			let self = this;
+		
+		
+		let sdpConstraints = {};
+			this.conexion2.createOffer(
+			function(sessionDescription) {
+				//self.addMensaje("sessionDescription recibida del servidor Stun");
+				self.conexion2.setLocalDescription(sessionDescription);
+				//self.addMensaje("sessionDescription enlazada a la RTCPeerConnnection local");
+				//self.addMensaje("Enviando oferta a " + self.destinatario + " mediante el servidor de Signaling");
+				let msg = {
+					type : "OFFER_GRUPO1",
+					sessionDescription : sessionDescription,
+					recipient : self.grupo()[2].nombre,
+					
+					
+				};
+				self.ws.send(JSON.stringify(msg));
+				//self.addMensaje("Oferta enviada al servidor de signaling");
+			},
+			function(error) {
+				//self.addMensaje("Error al crear oferta en el servidor Stun", true);
+			},
+			sdpConstraints
+		);
 	}
+	
 
 	addMensaje(texto, color) {
 		let mensaje = {
@@ -918,14 +968,20 @@ class VideoChat {
 		};
 		this.mensajes.push(mensaje);
 	}
-	setGrupo(grup){
-		console.log("me llega: "+grup.length)
+	setGrupo(grup, nam){
+		
+		var rem=new PersonaGrupo(this.ko, nam);
+		this.grupo().push(rem);
 		for(var i=0; i<grup.length; i++){
-			console.log("me llega: "+grup[i].nombre);
+			
 		var personag=new PersonaGrupo(this.ko, grup[i].nombre);
-		console.log(personag);
+		
 			this.grupo().push(personag);
 		}
+		
+		console.log("El grupo");
+		console.log(this.grupo());
+		
 		
 	}
 }
